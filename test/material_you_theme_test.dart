@@ -18,15 +18,15 @@ void main() {
       addTearDown(container.dispose);
 
       final settings = container.read(themeControllerProvider);
-      expect(settings.seedColor, equals(PixelSeeds.obsidianLavender));
+      expect(settings.seedColor, equals(PixelSeeds.cyberBlue));
       expect(settings.themeMode, equals(ThemeMode.dark));
       expect(settings.useSystemWallpaper, isFalse);
 
       final notifier = container.read(themeControllerProvider.notifier);
-      await notifier.setSeedColor(PixelSeeds.bayBlue);
+      await notifier.setSeedColor(PixelSeeds.emeraldMint);
 
       final updated = container.read(themeControllerProvider);
-      expect(updated.seedColor, equals(PixelSeeds.bayBlue));
+      expect(updated.seedColor, equals(PixelSeeds.emeraldMint));
 
       await notifier.toggleSystemWallpaper(true);
       expect(

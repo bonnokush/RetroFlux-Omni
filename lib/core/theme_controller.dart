@@ -2,21 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// 5 Google Pixel Material You Seed Color Presets
+/// 6 Vibrant Google Pixel Material You Seed Color Presets
 class PixelSeeds {
-  static const Color bayBlue = Color(0xFF8AB4F8); // Pixel Bay Blue
-  static const Color sageGreen = Color(0xFF81C995); // Lemongrass / Sage Green
-  static const Color obsidianLavender =
-      Color(0xFFC58AF9); // Obsidian Lavender / Violet
-  static const Color terracottaCoral = Color(0xFFF28B82); // Coral / Terracotta
-  static const Color amberGold = Color(0xFFFDD663); // Amber Gold
+  static const Color cyberBlue = Color(0xFF2979FF); // Electric Pixel Bay Blue
+  static const Color emeraldMint = Color(0xFF00E676); // Vivid Emerald / Mint
+  static const Color electricViolet = Color(0xFF8B5CF6); // Vibrant Radiant Violet
+  static const Color sunburstCoral = Color(0xFFFF5722); // Punchy Sunset Coral
+  static const Color solarAmber = Color(0xFFFFB300); // Radiant Golden Amber
+  static const Color neonCyan = Color(0xFF00E5FF); // Cyberpunk Neon Cyan
+
+  // Backwards-compatible aliases
+  static const Color bayBlue = cyberBlue;
+  static const Color obsidianLavender = electricViolet;
+  static const Color sageGreen = emeraldMint;
+  static const Color terracottaCoral = sunburstCoral;
+  static const Color amberGold = solarAmber;
 
   static const List<Map<String, dynamic>> all = [
-    {'name': 'Bay Blue', 'color': bayBlue},
-    {'name': 'Sage Green', 'color': sageGreen},
-    {'name': 'Lavender', 'color': obsidianLavender},
-    {'name': 'Terracotta', 'color': terracottaCoral},
-    {'name': 'Amber Gold', 'color': amberGold},
+    {'name': 'Cyber Blue', 'color': cyberBlue},
+    {'name': 'Emerald Mint', 'color': emeraldMint},
+    {'name': 'Electric Violet', 'color': electricViolet},
+    {'name': 'Sunburst Coral', 'color': sunburstCoral},
+    {'name': 'Solar Amber', 'color': solarAmber},
+    {'name': 'Neon Cyan', 'color': neonCyan},
   ];
 }
 
@@ -26,7 +34,7 @@ class ThemeSettings {
   final bool useSystemWallpaper;
 
   const ThemeSettings({
-    this.seedColor = PixelSeeds.obsidianLavender,
+    this.seedColor = PixelSeeds.cyberBlue,
     this.themeMode = ThemeMode.dark,
     this.useSystemWallpaper = false,
   });
@@ -65,7 +73,7 @@ class ThemeController extends StateNotifier<ThemeSettings> {
       final modeVal = prefs.getString(_prefModeKey);
       final sysWall = prefs.getBool(_prefSysWallKey) ?? false;
 
-      Color seed = PixelSeeds.obsidianLavender;
+      Color seed = PixelSeeds.cyberBlue;
       if (seedVal != null) {
         seed = Color(seedVal);
       }
@@ -113,16 +121,25 @@ class ThemeController extends StateNotifier<ThemeSettings> {
           brightness: brightness,
         );
 
-    // Custom deep neutral surface for Dark Mode
+    // Dynamic Material You tinted surfaces for true OLED/Dark depth
     final colorScheme = brightness == Brightness.dark
-        ? baseColorScheme.copyWith(
-            surface: const Color(0xFF121316),
-            surfaceContainerLow: const Color(0xFF16181C),
-            surfaceContainer: const Color(0xFF1A1C20),
-            surfaceContainerHigh: const Color(0xFF282A2F),
-            surfaceContainerHighest: const Color(0xFF33353A),
-            outlineVariant: const Color(0xFF2D3037),
-          )
+        ? () {
+            const surfaceBase = Color(0xFF0D0F13);
+            final accent = baseColorScheme.primary;
+            return baseColorScheme.copyWith(
+              surface: Color.alphaBlend(accent.withOpacity(0.04), surfaceBase),
+              surfaceContainerLow:
+                  Color.alphaBlend(accent.withOpacity(0.07), surfaceBase),
+              surfaceContainer:
+                  Color.alphaBlend(accent.withOpacity(0.11), surfaceBase),
+              surfaceContainerHigh:
+                  Color.alphaBlend(accent.withOpacity(0.16), surfaceBase),
+              surfaceContainerHighest:
+                  Color.alphaBlend(accent.withOpacity(0.22), surfaceBase),
+              outlineVariant: Color.alphaBlend(
+                  accent.withOpacity(0.16), const Color(0xFF1E2128)),
+            );
+          }()
         : baseColorScheme;
 
     return ThemeData(

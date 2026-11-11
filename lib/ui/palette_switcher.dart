@@ -135,17 +135,27 @@ class PaletteSwitcherSheet extends ConsumerWidget {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 250),
                     curve: Curves.easeInOut,
-                    width: 48,
-                    height: 48,
+                    width: 44,
+                    height: 44,
                     decoration: BoxDecoration(
                       color: color,
                       shape: BoxShape.circle,
+                      border: isSelected
+                          ? Border.all(
+                              color: Colors.white.withOpacity(0.9),
+                              width: 2.5,
+                            )
+                          : Border.all(
+                              color: Colors.white.withOpacity(0.15),
+                              width: 1,
+                            ),
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: color.withOpacity(0.4),
-                                blurRadius: 10,
-                                offset: const Offset(0, 3),
+                                color: color.withOpacity(0.6),
+                                blurRadius: 14,
+                                spreadRadius: 2,
+                                offset: const Offset(0, 4),
                               )
                             ]
                           : null,
@@ -156,8 +166,8 @@ class PaletteSwitcherSheet extends ConsumerWidget {
                         opacity: isSelected ? 1.0 : 0.0,
                         child: const Icon(
                           Icons.check_rounded,
-                          color: Colors.black87,
-                          size: 24,
+                          color: Colors.white,
+                          size: 22,
                         ),
                       ),
                     ),

@@ -438,7 +438,7 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
               ],
             ),
 
-            // HW Acceleration Toggle
+            // HW Acceleration Toggle (Unlocked for all tiers)
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -451,11 +451,7 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
                   value: _hwAccel,
                   activeColor: colorScheme.primary,
                   onChanged: (val) {
-                    if (!isPro) {
-                      ProModal.show(context);
-                    } else {
-                      setState(() => _hwAccel = val);
-                    }
+                    setState(() => _hwAccel = val);
                   },
                 ),
               ],
