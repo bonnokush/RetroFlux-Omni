@@ -6,7 +6,6 @@ import 'palette_switcher.dart';
 import 'dashboard_screen.dart';
 import 'studios/image_studio.dart';
 import 'studios/media_studio.dart';
-import 'studios/docs_studio.dart';
 import 'studios/history_view.dart';
 
 /// Responsive Adaptive Scaffold:
@@ -23,9 +22,8 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
 
   final List<Widget> _views = const [
     DashboardScreen(),
-    ImageStudio(),
     MediaStudio(),
-    DocsStudio(),
+    ImageStudio(),
     HistoryView(),
   ];
 
@@ -89,19 +87,9 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
               ),
               child: BottomNavigationBar(
-                currentIndex: _selectedIndex == 0
-                    ? 0
-                    : (_selectedIndex == 3 ? 1 : (_selectedIndex == 4 ? 2 : 0)),
+                currentIndex: _selectedIndex.clamp(0, 3),
                 onTap: (idx) {
-                  if (idx == 0) {
-                    setState(() => _selectedIndex = 0);
-                  } else if (idx == 1) {
-                    setState(() => _selectedIndex = 3);
-                  } else if (idx == 2) {
-                    setState(() => _selectedIndex = 4);
-                  } else if (idx == 3) {
-                    ProModal.show(context);
-                  }
+                  setState(() => _selectedIndex = idx);
                 },
                 type: BottomNavigationBarType.fixed,
                 backgroundColor: Colors.transparent,
@@ -111,10 +99,10 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
                 selectedFontSize: 12,
                 unselectedFontSize: 12,
                 items: const [
-                  BottomNavigationBarItem(icon: Icon(Icons.dashboard_outlined), activeIcon: Icon(Icons.dashboard), label: 'Dashboard'),
-                  BottomNavigationBarItem(icon: Icon(Icons.description_outlined), activeIcon: Icon(Icons.description), label: 'Docs'),
+                  BottomNavigationBarItem(icon: Icon(Icons.all_inbox_outlined), activeIcon: Icon(Icons.all_inbox), label: 'Queue'),
+                  BottomNavigationBarItem(icon: Icon(Icons.movie_creation_outlined), activeIcon: Icon(Icons.movie_creation), label: '4K Media'),
+                  BottomNavigationBarItem(icon: Icon(Icons.image_outlined), activeIcon: Icon(Icons.image), label: 'Images'),
                   BottomNavigationBarItem(icon: Icon(Icons.history_outlined), activeIcon: Icon(Icons.history), label: 'History'),
-                  BottomNavigationBarItem(icon: Icon(Icons.settings_outlined), activeIcon: Icon(Icons.settings), label: 'Settings'),
                 ],
               ),
             ),
@@ -197,10 +185,9 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
 
           // Google Pixel Tonal Menu Items with Full-Pill Stadium Container (BorderRadius.circular(100))
           _buildPillNavButton(Icons.all_inbox_outlined, Icons.all_inbox, 'Batch Queue', 0, colorScheme),
-          _buildPillNavButton(Icons.image_outlined, Icons.image, 'Image Tools', 1, colorScheme),
-          _buildPillNavButton(Icons.movie_creation_outlined, Icons.movie_creation, 'Media Engine', 2, colorScheme),
-          _buildPillNavButton(Icons.description_outlined, Icons.description, 'Docs & Office', 3, colorScheme, badge: 'OFFICE'),
-          _buildPillNavButton(Icons.history_outlined, Icons.history, 'Conversion History', 4, colorScheme),
+          _buildPillNavButton(Icons.movie_creation_outlined, Icons.movie_creation, '4K Media Studio', 1, colorScheme),
+          _buildPillNavButton(Icons.image_outlined, Icons.image, 'Image Tools', 2, colorScheme),
+          _buildPillNavButton(Icons.history_outlined, Icons.history, 'Conversion History', 3, colorScheme),
 
           const Spacer(),
 

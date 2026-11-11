@@ -4,11 +4,12 @@ import 'package:file_picker/file_picker.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import '../../core/worker_isolate.dart';
 import '../../core/license_service.dart';
+import '../../core/engine_bridge.dart';
 import '../pro_modal.dart';
 import '../palette_switcher.dart';
 import '../dashboard_screen.dart';
 
-/// Dedicated Video & Audio Media Studio
+/// Dedicated 4K Video & Audio Media Studio
 /// Pixel Native Material 3 + Material You Design
 class MediaStudio extends ConsumerStatefulWidget {
   const MediaStudio({super.key});
@@ -20,16 +21,33 @@ class MediaStudio extends ConsumerStatefulWidget {
 class _MediaStudioState extends ConsumerState<MediaStudio> {
   bool _isDragging = false;
   String _selectedCodec = 'H.264 (Universal)';
-  String _selectedResolution = '1080p FHD';
+  String _selectedResolution = '4K UHD (2160p)';
   bool _hwAccel = true;
+  bool _losslessRemux = false;
+  String _detectedGpuLabel = 'Detecting GPU...';
+
+  @override
+  void initState() {
+    super.initState();
+    _probeGpu();
+  }
+
+  Future<void> _probeGpu() async {
+    final caps = await EngineBridge.detectGpuCapabilities();
+    if (mounted) {
+      setState(() {
+        _detectedGpuLabel = caps.preferredVendorLabel;
+      });
+    }
+  }
 
   Future<void> _pickMediaFiles() async {
     final result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       type: FileType.custom,
       allowedExtensions: [
-        'mp4', 'mkv', 'mov', 'avi', 'webm', 'flv', 'wmv',
-        'mp3', 'wav', 'aac', 'flac', 'm4a', 'ogg', 'wma',
+        'mp4', 'mkv', 'mov', 'avi', 'webm', 'flv', 'wmv', 'ts', 'm4v',
+        'mp3', 'wav', 'aac', 'flac', 'm4a', 'ogg', 'opus', 'wma',
       ],
     );
 
@@ -121,7 +139,7 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
                   runSpacing: 4,
                   children: [
                     Text(
-                      'Video & Audio Media Studio',
+                      '4K Video & Audio Media Studio',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
@@ -136,7 +154,7 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
-                        isPro ? 'FFMPEG PRO' : 'FREE TIER (1080p CAP)',
+                        isPro ? '⚡ PRO 4K UHD UNLOCKED' : 'FREE TIER (1080p CAP)',
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -144,11 +162,26 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
                         ),
                       ),
                     ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerHigh,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        '⚡ $_detectedGpuLabel',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.primary,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Hardware-accelerated encoding, AV1/HEVC, and audio extraction • $count media file(s) in queue',
+                  'Hardware-accelerated 4K encoding, AV1/HEVC, instant lossless remux & audio extraction • $count file(s) in queue',
                   style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -197,6 +230,7 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
         runSpacing: 10,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
+          // Target Format Quick Chips
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -207,79 +241,135 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
               _buildTargetChip('WebM', 'webm', colorScheme),
               _buildTargetChip('MP3', 'mp3', colorScheme),
               _buildTargetChip('WAV', 'wav', colorScheme),
-              _buildTargetChip('GIF', 'gif', colorScheme),
+              _buildTargetChip('FLAC', 'flac', colorScheme),
             ],
           ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Codec: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colorScheme.onSurfaceVariant)),
-              DropdownButton<String>(
-                value: _selectedCodec,
-                dropdownColor: colorScheme.surfaceContainerHigh,
-                style: TextStyle(color: colorScheme.onSurface, fontSize: 12, fontWeight: FontWeight.w600),
-                underline: const SizedBox(),
-                items: [
-                  'H.264 (Universal)',
-                  'H.265 / HEVC ${isPro ? "" : "🔒 PRO"}',
-                  'AV1 Modern ${isPro ? "" : "🔒 PRO"}',
-                ].map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
-                onChanged: (val) {
-                  if (val != null) {
-                    if (val.contains('PRO') && !isPro) {
+
+          // Instant Lossless Remux Toggle
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: _losslessRemux ? colorScheme.primaryContainer.withOpacity(0.5) : Colors.transparent,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.bolt_rounded,
+                  size: 16,
+                  color: _losslessRemux ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'Lossless Remux (-c copy): ',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: _losslessRemux ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                Switch(
+                  value: _losslessRemux,
+                  activeColor: colorScheme.primary,
+                  onChanged: (val) {
+                    setState(() => _losslessRemux = val);
+                  },
+                ),
+              ],
+            ),
+          ),
+
+          if (!_losslessRemux) ...[
+            // Codec Dropdown
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Codec: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colorScheme.onSurfaceVariant)),
+                DropdownButton<String>(
+                  value: _selectedCodec,
+                  dropdownColor: colorScheme.surfaceContainerHigh,
+                  style: TextStyle(color: colorScheme.onSurface, fontSize: 12, fontWeight: FontWeight.w600),
+                  underline: const SizedBox(),
+                  items: [
+                    'H.264 (Universal)',
+                    'H.265 / HEVC ${isPro ? "" : "🔒 PRO"}',
+                    'AV1 Modern ${isPro ? "" : "🔒 PRO"}',
+                  ].map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                  onChanged: (val) {
+                    if (val != null) {
+                      if (val.contains('PRO') && !isPro) {
+                        ProModal.show(context);
+                      } else {
+                        setState(() => _selectedCodec = val);
+                      }
+                    }
+                  },
+                ),
+              ],
+            ),
+
+            // Resolution Dropdown (4K UHD first)
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Scale: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colorScheme.onSurfaceVariant)),
+                DropdownButton<String>(
+                  value: _selectedResolution,
+                  dropdownColor: colorScheme.surfaceContainerHigh,
+                  style: TextStyle(color: colorScheme.onSurface, fontSize: 12, fontWeight: FontWeight.w600),
+                  underline: const SizedBox(),
+                  items: [
+                    '4K UHD (2160p) ${isPro ? "" : "🔒 PRO"}',
+                    '1440p QHD ${isPro ? "" : "🔒 PRO"}',
+                    '1080p FHD',
+                    '720p HD',
+                    'Original Source',
+                  ].map((r) => DropdownMenuItem(value: r, child: Text(r))).toList(),
+                  onChanged: (val) {
+                    if (val != null) {
+                      if (val.contains('PRO') && !isPro) {
+                        ProModal.show(context);
+                      } else {
+                        setState(() => _selectedResolution = val);
+                      }
+                    }
+                  },
+                ),
+              ],
+            ),
+
+            // HW Acceleration Toggle
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('GPU Accel: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colorScheme.onSurfaceVariant)),
+                Switch(
+                  value: _hwAccel,
+                  activeColor: colorScheme.primary,
+                  onChanged: (val) {
+                    if (!isPro) {
                       ProModal.show(context);
                     } else {
-                      setState(() => _selectedCodec = val);
+                      setState(() => _hwAccel = val);
                     }
-                  }
-                },
+                  },
+                ),
+              ],
+            ),
+          ] else ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHigh,
+                borderRadius: BorderRadius.circular(12),
               ),
-            ],
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Scale: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colorScheme.onSurfaceVariant)),
-              DropdownButton<String>(
-                value: _selectedResolution,
-                dropdownColor: colorScheme.surfaceContainerHigh,
-                style: TextStyle(color: colorScheme.onSurface, fontSize: 12, fontWeight: FontWeight.w600),
-                underline: const SizedBox(),
-                items: [
-                  'Original Source',
-                  '1080p FHD',
-                  '720p HD',
-                  '4K UHD ${isPro ? "" : "🔒 PRO"}',
-                ].map((r) => DropdownMenuItem(value: r, child: Text(r))).toList(),
-                onChanged: (val) {
-                  if (val != null) {
-                    if (val.contains('PRO') && !isPro) {
-                      ProModal.show(context);
-                    } else {
-                      setState(() => _selectedResolution = val);
-                    }
-                  }
-                },
+              child: Text(
+                '⚡ Instant Container Remux: Swaps container in ~1 sec with zero re-encoding loss',
+                style: TextStyle(fontSize: 11, color: colorScheme.primary, fontWeight: FontWeight.w600),
               ),
-            ],
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('HW Accel: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colorScheme.onSurfaceVariant)),
-              Switch(
-                value: _hwAccel,
-                activeColor: colorScheme.primary,
-                onChanged: (val) {
-                  if (!isPro) {
-                    ProModal.show(context);
-                  } else {
-                    setState(() => _hwAccel = val);
-                  }
-                },
-              ),
-            ],
-          ),
+            ),
+          ],
         ],
       ),
     );
@@ -308,97 +398,70 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
 
   Widget _buildEmptyDropZone(ColorScheme colorScheme) {
     return Container(
-      width: double.infinity,
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainer,
+        color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(28),
       ),
       child: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHigh,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(Icons.movie_outlined, size: 40, color: colorScheme.primary),
-                ),
-                const SizedBox(height: 18),
-                Text(
-                  'No media files in queue',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: colorScheme.onSurface),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Drop video or audio files here to transcode or extract audio',
-                  style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
-                ),
-                const SizedBox(height: 24),
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    _buildM3Chip('MP4', colorScheme),
-                    _buildM3Chip('MKV', colorScheme),
-                    _buildM3Chip('MOV', colorScheme),
-                    _buildM3Chip('WebM', colorScheme),
-                    _buildM3Chip('MP3', colorScheme),
-                    _buildM3Chip('WAV', colorScheme),
-                    _buildM3Chip('FLAC', colorScheme),
-                    _buildM3Chip('AAC', colorScheme),
-                  ],
-                ),
-              ],
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: colorScheme.primaryContainer,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.movie_creation_outlined, color: colorScheme.primary, size: 36),
             ),
-          ),
+            const SizedBox(height: 20),
+            Text(
+              'Drag & Drop 4K Videos or Audio Files Here',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: colorScheme.onSurface),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'MP4, MKV, MOV, WebM, AVI, TS, MP3, FLAC, WAV • Hardware GPU Accelerated',
+              style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
+            ),
+            const SizedBox(height: 20),
+            FilledButton.tonalIcon(
+              style: FilledButton.styleFrom(
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              ),
+              icon: const Icon(Icons.file_upload_outlined, size: 18),
+              label: const Text('Browse Files', style: TextStyle(fontWeight: FontWeight.bold)),
+              onPressed: _pickMediaFiles,
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildCompactDropZone(ColorScheme colorScheme) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.video_library_outlined, color: colorScheme.primary, size: 20),
-          const SizedBox(width: 8),
-          Text(
-            'Drop more video or audio files to add to queue',
-            style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant, fontWeight: FontWeight.w600),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildM3Chip(String text, ColorScheme colorScheme) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-      decoration: ShapeDecoration(
-        color: colorScheme.secondaryContainer,
-        shape: const StadiumBorder(),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: colorScheme.onSecondaryContainer,
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.2,
+    return InkWell(
+      onTap: _pickMediaFiles,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.5)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.add_circle_outline, color: colorScheme.primary, size: 20),
+            const SizedBox(width: 10),
+            Text(
+              'Drop more media files or click to add',
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colorScheme.primary),
+            ),
+          ],
         ),
       ),
     );
@@ -407,16 +470,15 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
   Widget _buildMediaQueueList(List<ConversionTask> mediaTasks, bool isPro, ColorScheme colorScheme) {
     return ListView.separated(
       itemCount: mediaTasks.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
-      itemBuilder: (context, idx) {
-        final task = mediaTasks[idx];
-        return _buildMediaTaskItem(task, isPro, colorScheme);
+      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      itemBuilder: (context, index) {
+        return _buildMediaTaskItem(mediaTasks[index], isPro, colorScheme);
       },
     );
   }
 
   Widget _buildMediaTaskItem(ConversionTask task, bool isPro, ColorScheme colorScheme) {
-    final availableTargets = ['mp4', 'mkv', 'mov', 'webm', 'mp3', 'wav', 'aac', 'flac', 'gif'];
+    final availableTargets = ['mp4', 'mkv', 'mov', 'webm', 'mp3', 'wav', 'flac', 'aac'];
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
@@ -425,6 +487,7 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
@@ -449,8 +512,9 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Target format: ${task.targetFormat.toUpperCase()}',
+                      'Target: ${task.targetFormat.toUpperCase()} ${task.statusDetail != null ? "• ${task.statusDetail}" : ""}',
                       style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -489,16 +553,64 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
               ),
             ],
           ),
+
+          // Real-Time Progress & Telemetry UI
           if (task.status == TaskStatus.processing) ...[
             const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${(task.progress * 100).toStringAsFixed(0)}%',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: colorScheme.primary),
+                ),
+                Wrap(
+                  spacing: 12,
+                  children: [
+                    if (task.fps != null)
+                      Text('🎬 ${task.fps!.toStringAsFixed(0)} FPS', style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant)),
+                    if (task.speed != null)
+                      Text('⚡ Speed: ${task.speed}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: colorScheme.primary)),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: LinearProgressIndicator(
                 value: task.progress > 0 ? task.progress : null,
                 backgroundColor: colorScheme.surfaceContainerHighest,
                 valueColor: AlwaysStoppedAnimation(colorScheme.primary),
-                minHeight: 4,
+                minHeight: 5,
               ),
+            ),
+          ] else if (task.status == TaskStatus.completed) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(Icons.check_circle_rounded, color: Colors.greenAccent, size: 16),
+                const SizedBox(width: 6),
+                Text(
+                  task.statusDetail ?? 'Completed',
+                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.greenAccent),
+                ),
+              ],
+            ),
+          ] else if (task.status == TaskStatus.failed) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 16),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    task.errorMessage ?? 'Encoding failed',
+                    style: const TextStyle(fontSize: 11, color: Colors.redAccent),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
           ],
         ],
@@ -540,7 +652,14 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
             ),
             onPressed: isProcessing || mediaTasks.isEmpty
                 ? null
-                : () => ref.read(taskQueueProvider.notifier).startBatchConversion(),
+                : () {
+                    ref.read(taskQueueProvider.notifier).startBatchConversion({
+                      'codec': _selectedCodec,
+                      'resolution': _selectedResolution,
+                      'hwAccel': _hwAccel,
+                      'losslessRemux': _losslessRemux,
+                    });
+                  },
           ),
         ],
       ),

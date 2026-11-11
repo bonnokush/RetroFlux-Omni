@@ -130,7 +130,7 @@ class RetroFluxTheme {
           letterSpacing: 0.15,
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: surfaceContainer,
         elevation: 0,
         shape: RoundedRectangleBorder(
@@ -156,7 +156,7 @@ class RetroFluxTheme {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         ),
       ),
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: surfaceContainer,
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),

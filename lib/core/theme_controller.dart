@@ -171,7 +171,7 @@ class ThemeController extends StateNotifier<ThemeSettings> {
           textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, letterSpacing: 0.1),
         ),
       ),
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: colorScheme.surfaceContainer,
         elevation: 6,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),

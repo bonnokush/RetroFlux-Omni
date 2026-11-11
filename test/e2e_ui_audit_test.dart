@@ -50,8 +50,8 @@ void main() {
       await tester.tap(imageNav);
       await tester.pumpAndSettle();
 
-      // Click 'Media Engine' nav button
-      final mediaNav = find.text('Media Engine');
+      // Click '4K Media Studio' nav button
+      final mediaNav = find.text('4K Media Studio');
       expect(mediaNav, findsOneWidget);
       await tester.tap(mediaNav);
       await tester.pumpAndSettle();

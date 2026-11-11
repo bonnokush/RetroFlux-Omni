@@ -35,6 +35,9 @@ class ConversionTask {
   double progress;
   String? errorMessage;
   Duration? duration;
+  String? speed;
+  double? fps;
+  String? statusDetail;
 
   ConversionTask({
     required this.id,
@@ -49,6 +52,9 @@ class ConversionTask {
     this.progress = 0.0,
     this.errorMessage,
     this.duration,
+    this.speed,
+    this.fps,
+    this.statusDetail,
   }) : createdAt = createdAt ?? DateTime.now();
 
   String get fileName {

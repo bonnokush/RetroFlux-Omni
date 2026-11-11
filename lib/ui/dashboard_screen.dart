@@ -70,6 +70,10 @@ class TaskQueueNotifier extends StateNotifier<List<ConversionTask>> {
             createdAt: task.createdAt,
             status: task.status,
             progress: task.progress,
+            duration: task.duration,
+            speed: task.speed,
+            fps: task.fps,
+            statusDetail: task.statusDetail,
           )
         else
           task
@@ -77,6 +81,31 @@ class TaskQueueNotifier extends StateNotifier<List<ConversionTask>> {
   }
 
   void updateTaskTarget(String taskId, String newFormat) => updateTargetFormat(taskId, newFormat);
+
+  void updateTaskOptions(String taskId, Map<String, dynamic> newOptions) {
+    state = [
+      for (final task in state)
+        if (task.id == taskId)
+          ConversionTask(
+            id: task.id,
+            inputPath: task.inputPath,
+            outputPath: task.outputPath,
+            targetFormat: task.targetFormat,
+            category: task.category,
+            options: {...task.options, ...newOptions},
+            fileSizeBytes: task.fileSizeBytes,
+            createdAt: task.createdAt,
+            status: task.status,
+            progress: task.progress,
+            duration: task.duration,
+            speed: task.speed,
+            fps: task.fps,
+            statusDetail: task.statusDetail,
+          )
+        else
+          task
+    ];
+  }
 
   void removeTask(String id) {
     state = state.where((t) => t.id != id).toList();
@@ -86,10 +115,14 @@ class TaskQueueNotifier extends StateNotifier<List<ConversionTask>> {
     state = [];
   }
 
-  Future<void> startBatchConversion() async {
+  Future<void> startBatchConversion([Map<String, dynamic>? globalOptions]) async {
     for (final task in state) {
       if (task.status == TaskStatus.completed || task.status == TaskStatus.processing) {
         continue;
+      }
+
+      if (globalOptions != null) {
+        task.options.addAll(globalOptions);
       }
 
       task.status = TaskStatus.processing;
@@ -110,14 +143,10 @@ class TaskQueueNotifier extends StateNotifier<List<ConversionTask>> {
   }
 
   TaskCategory _categorizeExtension(String ext) {
-    if (['mp4', 'mkv', 'mov', 'avi', 'webm', 'flv', 'wmv', 'mp3', 'wav', 'aac', 'flac', 'm4a', 'ogg', 'wma'].contains(ext)) {
+    if (['mp4', 'mkv', 'mov', 'avi', 'webm', 'flv', 'wmv', 'ts', 'm4v', 'mp3', 'wav', 'aac', 'flac', 'm4a', 'ogg', 'opus', 'wma'].contains(ext)) {
       return TaskCategory.media;
-    } else if (['jpg', 'jpeg', 'png', 'webp', 'bmp', 'tga', 'gif', 'ico', 'tiff'].contains(ext)) {
-      return TaskCategory.image;
-    } else if (['json', 'csv', 'yaml', 'xml'].contains(ext)) {
-      return TaskCategory.data;
     }
-    return TaskCategory.document;
+    return TaskCategory.image;
   }
 
   String _defaultTargetForCategory(TaskCategory cat, String sourceExt) {
@@ -125,15 +154,12 @@ class TaskQueueNotifier extends StateNotifier<List<ConversionTask>> {
       case TaskCategory.image:
         return sourceExt == 'png' ? 'jpg' : 'png';
       case TaskCategory.media:
-        return sourceExt == 'mp4' ? 'mp3' : 'mp4';
+        final isAudio = ['mp3', 'wav', 'aac', 'flac', 'm4a', 'ogg', 'opus', 'wma'].contains(sourceExt);
+        if (isAudio) return sourceExt == 'mp3' ? 'wav' : 'mp3';
+        return sourceExt == 'mp4' ? 'mkv' : 'mp4';
       case TaskCategory.data:
-        return sourceExt == 'json' ? 'csv' : 'json';
       case TaskCategory.document:
-        if (['docx', 'doc', 'pptx', 'ppt'].contains(sourceExt)) return 'pdf';
-        if (['xlsx', 'xls'].contains(sourceExt)) return 'csv';
-        if (sourceExt == 'pdf') return 'txt';
-        if (['md', 'txt'].contains(sourceExt)) return 'docx';
-        return 'html';
+        return 'txt';
     }
   }
 
