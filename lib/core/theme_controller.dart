@@ -6,7 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class PixelSeeds {
   static const Color bayBlue = Color(0xFF8AB4F8); // Pixel Bay Blue
   static const Color sageGreen = Color(0xFF81C995); // Lemongrass / Sage Green
-  static const Color obsidianLavender = Color(0xFFC58AF9); // Obsidian Lavender / Violet
+  static const Color obsidianLavender =
+      Color(0xFFC58AF9); // Obsidian Lavender / Violet
   static const Color terracottaCoral = Color(0xFFF28B82); // Coral / Terracotta
   static const Color amberGold = Color(0xFFFDD663); // Amber Gold
 
@@ -43,7 +44,8 @@ class ThemeSettings {
   }
 }
 
-final themeControllerProvider = StateNotifierProvider<ThemeController, ThemeSettings>((ref) {
+final themeControllerProvider =
+    StateNotifierProvider<ThemeController, ThemeSettings>((ref) {
   return ThemeController();
 });
 
@@ -158,7 +160,8 @@ class ThemeController extends StateNotifier<ThemeSettings> {
         style: FilledButton.styleFrom(
           shape: const StadiumBorder(),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, letterSpacing: 0.1),
+          textStyle: const TextStyle(
+              fontWeight: FontWeight.w700, fontSize: 13, letterSpacing: 0.1),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -168,7 +171,8 @@ class ThemeController extends StateNotifier<ThemeSettings> {
           elevation: 0,
           shape: const StadiumBorder(),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, letterSpacing: 0.1),
+          textStyle: const TextStyle(
+              fontWeight: FontWeight.w700, fontSize: 13, letterSpacing: 0.1),
         ),
       ),
       dialogTheme: DialogThemeData(

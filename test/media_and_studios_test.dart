@@ -11,7 +11,8 @@ void main() {
   });
 
   group('Dedicated 4K Media Studio & Image Studio Tests', () {
-    testWidgets('1. Navigate into 4K Media Studio and Verify Controls', (WidgetTester tester) async {
+    testWidgets('1. Navigate into 4K Media Studio and Verify Controls',
+        (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1200, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());

@@ -26,7 +26,17 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
     final result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       type: FileType.custom,
-      allowedExtensions: ['png', 'jpg', 'jpeg', 'webp', 'bmp', 'tga', 'gif', 'ico', 'tiff'],
+      allowedExtensions: [
+        'png',
+        'jpg',
+        'jpeg',
+        'webp',
+        'bmp',
+        'tga',
+        'gif',
+        'ico',
+        'tiff'
+      ],
     );
 
     if (result != null && result.paths.isNotEmpty) {
@@ -37,16 +47,20 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
 
   void _applyBatchFormat(String targetFormat) {
     final tasks = ref.read(taskQueueProvider);
-    final imageTasks = tasks.where((t) => t.category == TaskCategory.image).toList();
+    final imageTasks =
+        tasks.where((t) => t.category == TaskCategory.image).toList();
     for (final task in imageTasks) {
-      ref.read(taskQueueProvider.notifier).updateTaskTarget(task.id, targetFormat);
+      ref
+          .read(taskQueueProvider.notifier)
+          .updateTaskTarget(task.id, targetFormat);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final tasks = ref.watch(taskQueueProvider);
-    final imageTasks = tasks.where((t) => t.category == TaskCategory.image).toList();
+    final imageTasks =
+        tasks.where((t) => t.category == TaskCategory.image).toList();
     final isPro = ref.watch(licenseStateProvider) == LicenseTier.pro;
     final isProcessing = tasks.any((t) => t.status == TaskStatus.processing);
     final colorScheme = Theme.of(context).colorScheme;
@@ -66,7 +80,8 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeaderBanner(context, isPro, imageTasks.length, colorScheme),
+                _buildHeaderBanner(
+                    context, isPro, imageTasks.length, colorScheme),
                 const SizedBox(height: 16),
                 _buildSettingsDeck(colorScheme),
                 const SizedBox(height: 16),
@@ -75,7 +90,9 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
                 else ...[
                   _buildCompactDropZone(colorScheme),
                   const SizedBox(height: 16),
-                  Expanded(child: _buildImageQueueList(imageTasks, isPro, colorScheme)),
+                  Expanded(
+                      child:
+                          _buildImageQueueList(imageTasks, isPro, colorScheme)),
                 ],
                 const SizedBox(height: 16),
                 _buildBottomActionBar(imageTasks, isProcessing, colorScheme),
@@ -88,7 +105,8 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
     );
   }
 
-  Widget _buildHeaderBanner(BuildContext context, bool isPro, int count, ColorScheme colorScheme) {
+  Widget _buildHeaderBanner(
+      BuildContext context, bool isPro, int count, ColorScheme colorScheme) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       decoration: BoxDecoration(
@@ -126,9 +144,12 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 3),
                       decoration: BoxDecoration(
-                        color: isPro ? colorScheme.secondaryContainer : colorScheme.surfaceContainerHighest,
+                        color: isPro
+                            ? colorScheme.secondaryContainer
+                            : colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
@@ -136,7 +157,9 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
-                          color: isPro ? colorScheme.onSecondaryContainer : colorScheme.primary,
+                          color: isPro
+                              ? colorScheme.onSecondaryContainer
+                              : colorScheme.primary,
                         ),
                       ),
                     ),
@@ -145,7 +168,8 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
                 const SizedBox(height: 4),
                 Text(
                   'Multi-threaded isolate workers, WebP lossless, and photo compression • $count image(s) in queue',
-                  style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+                  style: TextStyle(
+                      fontSize: 12, color: colorScheme.onSurfaceVariant),
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -158,7 +182,8 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
               backgroundColor: colorScheme.surfaceContainerHigh,
               padding: const EdgeInsets.all(12),
             ),
-            icon: Icon(Icons.palette_outlined, color: colorScheme.primary, size: 20),
+            icon: Icon(Icons.palette_outlined,
+                color: colorScheme.primary, size: 20),
             onPressed: () => PaletteSwitcherSheet.show(context),
           ),
           const SizedBox(width: 8),
@@ -172,7 +197,10 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
             icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
             label: const Text(
               'Add Images',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, letterSpacing: 0.1),
+              style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                  letterSpacing: 0.1),
             ),
             onPressed: _pickImageFiles,
           ),
@@ -196,7 +224,11 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Format: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colorScheme.onSurfaceVariant)),
+              Text('Format: ',
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurfaceVariant)),
               _buildTargetChip('WebP', 'webp', colorScheme),
               _buildTargetChip('PNG', 'png', colorScheme),
               _buildTargetChip('JPG', 'jpg', colorScheme),
@@ -208,7 +240,11 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Quality (${_quality.round()}%): ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colorScheme.onSurfaceVariant)),
+              Text('Quality (${_quality.round()}%): ',
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurfaceVariant)),
               SizedBox(
                 width: 120,
                 child: Slider(
@@ -224,18 +260,27 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Scale: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colorScheme.onSurfaceVariant)),
+              Text('Scale: ',
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurfaceVariant)),
               DropdownButton<String>(
                 value: _selectedScale,
                 dropdownColor: colorScheme.surfaceContainerHigh,
-                style: TextStyle(color: colorScheme.onSurface, fontSize: 12, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                    color: colorScheme.onSurface,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600),
                 underline: const SizedBox(),
                 items: [
                   'Original (100%)',
                   '75% Scale',
                   '50% Half-Scale',
                   '25% Thumbnail',
-                ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+                ]
+                    .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                    .toList(),
                 onChanged: (val) {
                   if (val != null) setState(() => _selectedScale = val);
                 },
@@ -261,7 +306,10 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
           ),
           child: Text(
             label,
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: colorScheme.primary),
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: colorScheme.primary),
           ),
         ),
       ),
@@ -289,17 +337,22 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
                     color: colorScheme.surfaceContainerHigh,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.image_outlined, size: 40, color: colorScheme.primary),
+                  child: Icon(Icons.image_outlined,
+                      size: 40, color: colorScheme.primary),
                 ),
                 const SizedBox(height: 18),
                 Text(
                   'No images in queue',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: colorScheme.onSurface),
+                  style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      color: colorScheme.onSurface),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   'Drop PNG, JPG, or WebP images to optimize and convert',
-                  style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
+                  style: TextStyle(
+                      fontSize: 13, color: colorScheme.onSurfaceVariant),
                 ),
                 const SizedBox(height: 24),
                 Wrap(
@@ -335,11 +388,15 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.photo_library_outlined, color: colorScheme.primary, size: 20),
+          Icon(Icons.photo_library_outlined,
+              color: colorScheme.primary, size: 20),
           const SizedBox(width: 8),
           Text(
             'Drop more PNG, JPG, or WebP images to add to queue',
-            style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant, fontWeight: FontWeight.w600),
+            style: TextStyle(
+                fontSize: 12,
+                color: colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -365,7 +422,8 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
     );
   }
 
-  Widget _buildImageQueueList(List<ConversionTask> imageTasks, bool isPro, ColorScheme colorScheme) {
+  Widget _buildImageQueueList(
+      List<ConversionTask> imageTasks, bool isPro, ColorScheme colorScheme) {
     return ListView.separated(
       itemCount: imageTasks.length,
       separatorBuilder: (_, __) => const SizedBox(height: 8),
@@ -376,7 +434,8 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
     );
   }
 
-  Widget _buildImageTaskItem(ConversionTask task, bool isPro, ColorScheme colorScheme) {
+  Widget _buildImageTaskItem(
+      ConversionTask task, bool isPro, ColorScheme colorScheme) {
     final availableTargets = ['webp', 'png', 'jpg', 'bmp', 'ico', 'gif'];
 
     return Container(
@@ -405,30 +464,41 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
                   children: [
                     Text(
                       task.fileName,
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: colorScheme.onSurface),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                          color: colorScheme.onSurface),
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
                     Text(
                       'Target format: ${task.targetFormat.toUpperCase()}',
-                      style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant),
+                      style: TextStyle(
+                          fontSize: 11, color: colorScheme.onSurfaceVariant),
                     ),
                   ],
                 ),
               ),
-              Icon(Icons.arrow_forward_rounded, size: 16, color: colorScheme.onSurfaceVariant),
+              Icon(Icons.arrow_forward_rounded,
+                  size: 16, color: colorScheme.onSurfaceVariant),
               const SizedBox(width: 10),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
                 decoration: ShapeDecoration(
                   color: colorScheme.surfaceContainerHigh,
                   shape: const StadiumBorder(),
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
-                    value: availableTargets.contains(task.targetFormat) ? task.targetFormat : 'webp',
+                    value: availableTargets.contains(task.targetFormat)
+                        ? task.targetFormat
+                        : 'webp',
                     dropdownColor: colorScheme.surfaceContainerHigh,
-                    style: TextStyle(color: colorScheme.primary, fontSize: 12, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        color: colorScheme.primary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold),
                     items: availableTargets.map((target) {
                       return DropdownMenuItem(
                         value: target,
@@ -437,7 +507,9 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
                     }).toList(),
                     onChanged: (newFormat) {
                       if (newFormat != null) {
-                        ref.read(taskQueueProvider.notifier).updateTaskTarget(task.id, newFormat);
+                        ref
+                            .read(taskQueueProvider.notifier)
+                            .updateTaskTarget(task.id, newFormat);
                       }
                     },
                   ),
@@ -445,8 +517,10 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
               ),
               const SizedBox(width: 12),
               IconButton(
-                icon: Icon(Icons.close, size: 18, color: colorScheme.onSurfaceVariant),
-                onPressed: () => ref.read(taskQueueProvider.notifier).removeTask(task.id),
+                icon: Icon(Icons.close,
+                    size: 18, color: colorScheme.onSurfaceVariant),
+                onPressed: () =>
+                    ref.read(taskQueueProvider.notifier).removeTask(task.id),
               ),
             ],
           ),
@@ -467,7 +541,8 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
     );
   }
 
-  Widget _buildBottomActionBar(List<ConversionTask> imageTasks, bool isProcessing, ColorScheme colorScheme) {
+  Widget _buildBottomActionBar(List<ConversionTask> imageTasks,
+      bool isProcessing, ColorScheme colorScheme) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       decoration: BoxDecoration(
@@ -479,7 +554,10 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
         children: [
           Text(
             '${imageTasks.length} image(s) in queue',
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colorScheme.onSurfaceVariant),
+            style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: colorScheme.onSurfaceVariant),
           ),
           FilledButton.tonalIcon(
             style: FilledButton.styleFrom(
@@ -493,15 +571,23 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
               padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 14),
             ),
             icon: isProcessing
-                ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: colorScheme.onPrimaryContainer))
+                ? SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: colorScheme.onPrimaryContainer))
                 : const Icon(Icons.play_arrow_rounded, size: 20),
             label: Text(
               isProcessing ? 'Optimizing...' : 'Convert All Images',
-              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, letterSpacing: 0.1),
+              style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                  letterSpacing: 0.1),
             ),
             onPressed: isProcessing || imageTasks.isEmpty
                 ? null
-                : () => ref.read(taskQueueProvider.notifier).startBatchConversion(),
+                : () =>
+                    ref.read(taskQueueProvider.notifier).startBatchConversion(),
           ),
         ],
       ),
@@ -521,11 +607,15 @@ class _ImageStudioState extends ConsumerState<ImageStudio> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.photo_library_outlined, color: colorScheme.primary, size: 54),
+              Icon(Icons.photo_library_outlined,
+                  color: colorScheme.primary, size: 54),
               const SizedBox(height: 14),
               Text(
                 'DROP IMAGE FILES HERE',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: colorScheme.primary),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.primary),
               ),
             ],
           ),

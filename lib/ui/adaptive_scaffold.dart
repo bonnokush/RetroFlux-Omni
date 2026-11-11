@@ -65,7 +65,8 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
               actions: [
                 IconButton(
                   tooltip: 'Material You Palette',
-                  icon: Icon(Icons.palette_outlined, color: colorScheme.primary),
+                  icon:
+                      Icon(Icons.palette_outlined, color: colorScheme.primary),
                   onPressed: () => PaletteSwitcherSheet.show(context),
                 ),
                 IconButton(
@@ -84,7 +85,8 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
             bottomNavigationBar: Container(
               decoration: BoxDecoration(
                 color: colorScheme.surfaceContainer,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
               ),
               child: BottomNavigationBar(
                 currentIndex: _selectedIndex.clamp(0, 3),
@@ -99,10 +101,22 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
                 selectedFontSize: 12,
                 unselectedFontSize: 12,
                 items: const [
-                  BottomNavigationBarItem(icon: Icon(Icons.all_inbox_outlined), activeIcon: Icon(Icons.all_inbox), label: 'Queue'),
-                  BottomNavigationBarItem(icon: Icon(Icons.movie_creation_outlined), activeIcon: Icon(Icons.movie_creation), label: '4K Media'),
-                  BottomNavigationBarItem(icon: Icon(Icons.image_outlined), activeIcon: Icon(Icons.image), label: 'Images'),
-                  BottomNavigationBarItem(icon: Icon(Icons.history_outlined), activeIcon: Icon(Icons.history), label: 'History'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.all_inbox_outlined),
+                      activeIcon: Icon(Icons.all_inbox),
+                      label: 'Queue'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.movie_creation_outlined),
+                      activeIcon: Icon(Icons.movie_creation),
+                      label: '4K Media'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.image_outlined),
+                      activeIcon: Icon(Icons.image),
+                      label: 'Images'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.history_outlined),
+                      activeIcon: Icon(Icons.history),
+                      label: 'History'),
                 ],
               ),
             ),
@@ -113,7 +127,8 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
   }
 
   /// Google Pixel-style Navigation Drawer using tonal surface containers and stadium active pills
-  Widget _buildPixelDrawer(BuildContext context, bool isPro, ColorScheme colorScheme) {
+  Widget _buildPixelDrawer(
+      BuildContext context, bool isPro, ColorScheme colorScheme) {
     return Container(
       width: 280,
       color: colorScheme.surfaceContainerLow,
@@ -134,7 +149,8 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
                     shape: BoxShape.circle,
                   ),
                   child: Center(
-                    child: Icon(Icons.swap_horiz_rounded, color: colorScheme.primary, size: 24),
+                    child: Icon(Icons.swap_horiz_rounded,
+                        color: colorScheme.primary, size: 24),
                   ),
                 ),
                 const SizedBox(width: 14),
@@ -184,10 +200,14 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
           const SizedBox(height: 4),
 
           // Google Pixel Tonal Menu Items with Full-Pill Stadium Container (BorderRadius.circular(100))
-          _buildPillNavButton(Icons.all_inbox_outlined, Icons.all_inbox, 'Batch Queue', 0, colorScheme),
-          _buildPillNavButton(Icons.movie_creation_outlined, Icons.movie_creation, '4K Media Studio', 1, colorScheme),
-          _buildPillNavButton(Icons.image_outlined, Icons.image, 'Image Tools', 2, colorScheme),
-          _buildPillNavButton(Icons.history_outlined, Icons.history, 'Conversion History', 3, colorScheme),
+          _buildPillNavButton(Icons.all_inbox_outlined, Icons.all_inbox,
+              'Batch Queue', 0, colorScheme),
+          _buildPillNavButton(Icons.movie_creation_outlined,
+              Icons.movie_creation, '4K Media Studio', 1, colorScheme),
+          _buildPillNavButton(
+              Icons.image_outlined, Icons.image, 'Image Tools', 2, colorScheme),
+          _buildPillNavButton(Icons.history_outlined, Icons.history,
+              'Conversion History', 3, colorScheme),
 
           const Spacer(),
 
@@ -198,7 +218,9 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: isPro ? colorScheme.secondaryContainer : colorScheme.tertiaryContainer,
+                color: isPro
+                    ? colorScheme.secondaryContainer
+                    : colorScheme.tertiaryContainer,
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Row(
@@ -214,7 +236,9 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
                     ),
                     child: Icon(
                       Icons.star_rounded,
-                      color: isPro ? colorScheme.primary : colorScheme.onTertiaryContainer,
+                      color: isPro
+                          ? colorScheme.primary
+                          : colorScheme.onTertiaryContainer,
                       size: 22,
                     ),
                   ),
@@ -228,7 +252,9 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: isPro ? colorScheme.onSecondaryContainer : colorScheme.onTertiaryContainer,
+                            color: isPro
+                                ? colorScheme.onSecondaryContainer
+                                : colorScheme.onTertiaryContainer,
                           ),
                         ),
                         Text(
@@ -236,8 +262,10 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
                           style: TextStyle(
                             fontSize: 11,
                             color: isPro
-                                ? colorScheme.onSecondaryContainer.withOpacity(0.8)
-                                : colorScheme.onTertiaryContainer.withOpacity(0.8),
+                                ? colorScheme.onSecondaryContainer
+                                    .withOpacity(0.8)
+                                : colorScheme.onTertiaryContainer
+                                    .withOpacity(0.8),
                           ),
                         ),
                       ],
@@ -246,7 +274,9 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
                   Icon(
                     Icons.arrow_forward_ios_rounded,
                     size: 14,
-                    color: isPro ? colorScheme.onSecondaryContainer : colorScheme.onTertiaryContainer,
+                    color: isPro
+                        ? colorScheme.onSecondaryContainer
+                        : colorScheme.onTertiaryContainer,
                   ),
                 ],
               ),
@@ -286,7 +316,9 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
                 Icon(
                   isSelected ? selectedIcon : unselectedIcon,
                   size: 20,
-                  color: isSelected ? colorScheme.onSecondaryContainer : colorScheme.onSurfaceVariant,
+                  color: isSelected
+                      ? colorScheme.onSecondaryContainer
+                      : colorScheme.onSurfaceVariant,
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -295,14 +327,18 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 13,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                      color: isSelected ? colorScheme.onSecondaryContainer : colorScheme.onSurfaceVariant,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w500,
+                      color: isSelected
+                          ? colorScheme.onSecondaryContainer
+                          : colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
                 if (badge != null)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? colorScheme.primary.withOpacity(0.2)
@@ -314,7 +350,9 @@ class _AdaptiveScaffoldState extends ConsumerState<AdaptiveScaffold> {
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
-                        color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                        color: isSelected
+                            ? colorScheme.primary
+                            : colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ),

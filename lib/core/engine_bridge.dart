@@ -20,7 +20,8 @@ class GpuCapabilities {
     this.hasAppleVideoToolbox = false,
   });
 
-  bool get hasAnyGpu => hasIntelQsv || hasNvidiaNvenc || hasAmdAmf || hasAppleVideoToolbox;
+  bool get hasAnyGpu =>
+      hasIntelQsv || hasNvidiaNvenc || hasAmdAmf || hasAppleVideoToolbox;
 
   String get preferredVendorLabel {
     if (hasNvidiaNvenc) return 'NVIDIA NVENC';
@@ -45,7 +46,8 @@ class EngineBridge {
   }) : workerPool = workerPool ?? WorkerIsolatePool();
 
   /// Converts a single task using the optimal platform engine
-  Future<void> executeTask(ConversionTask task, {void Function(double progress)? onProgress}) async {
+  Future<void> executeTask(ConversionTask task,
+      {void Function(double progress)? onProgress}) async {
     switch (task.category) {
       case TaskCategory.media:
         await _executeMediaConversion(task, onProgress);
@@ -63,7 +65,8 @@ class EngineBridge {
 
   // --- Image Processing (Zero UI Blocking Dart Isolate Worker) ---
 
-  Future<void> _executeImageConversion(ConversionTask task, void Function(double progress)? onProgress) async {
+  Future<void> _executeImageConversion(
+      ConversionTask task, void Function(double progress)? onProgress) async {
     final receivePort = ReceivePort();
     final completer = Completer<void>();
 
@@ -101,7 +104,8 @@ class EngineBridge {
 
   // --- High-Performance 4K Video & Audio Engine (FFmpeg HW Accel) ---
 
-  Future<void> _executeMediaConversion(ConversionTask task, void Function(double progress)? onProgress) async {
+  Future<void> _executeMediaConversion(
+      ConversionTask task, void Function(double progress)? onProgress) async {
     onProgress?.call(0.02);
 
     final ffmpegPath = await resolveFfmpegPath();
@@ -113,7 +117,16 @@ class EngineBridge {
 
     final gpu = await detectGpuCapabilities(ffmpegPath);
     final targetExt = task.targetFormat.toLowerCase().replaceAll('.', '');
-    final isAudioTarget = ['mp3', 'wav', 'aac', 'flac', 'm4a', 'ogg', 'opus', 'wma'].contains(targetExt);
+    final isAudioTarget = [
+      'mp3',
+      'wav',
+      'aac',
+      'flac',
+      'm4a',
+      'ogg',
+      'opus',
+      'wma'
+    ].contains(targetExt);
     final isLosslessRemux = task.options['losslessRemux'] as bool? ?? false;
 
     final List<String> arguments = [
@@ -122,7 +135,8 @@ class EngineBridge {
     ];
 
     // Hardware decoder acceleration before input
-    final hwAccelEnabled = (task.options['hwAccel'] as bool? ?? true) && licenseService.isPro;
+    final hwAccelEnabled =
+        (task.options['hwAccel'] as bool? ?? true) && licenseService.isPro;
     if (hwAccelEnabled && !isLosslessRemux && !isAudioTarget) {
       if (gpu.hasIntelQsv) {
         arguments.addAll(['-hwaccel', 'qsv']);
@@ -140,9 +154,12 @@ class EngineBridge {
     if (isLosslessRemux) {
       // ⚡ Instant Lossless Stream Copy (1-2 seconds for 20GB+ 4K files)
       arguments.addAll([
-        '-c:v', 'copy',
-        '-c:a', 'copy',
-        '-map', '0',
+        '-c:v',
+        'copy',
+        '-c:a',
+        'copy',
+        '-map',
+        '0',
       ]);
       task.statusDetail = 'Lossless Stream Copy (Zero quality loss)';
     } else if (isAudioTarget) {
@@ -173,8 +190,10 @@ class EngineBridge {
       task.statusDetail = 'Extracting Hi-Fi Audio (${targetExt.toUpperCase()})';
     } else {
       // ⚡ 4K / HD Video Transcoding with GPU Acceleration
-      final requestedCodec = task.options['codec'] as String? ?? 'H.264 (Universal)';
-      final requestedRes = task.options['resolution'] as String? ?? 'Original Source';
+      final requestedCodec =
+          task.options['codec'] as String? ?? 'H.264 (Universal)';
+      final requestedRes =
+          task.options['resolution'] as String? ?? 'Original Source';
 
       // 1. Resolution & Scale Filters
       if (!licenseService.isPro) {
@@ -183,7 +202,8 @@ class EngineBridge {
       } else {
         if (requestedRes.contains('4K')) {
           arguments.addAll(['-vf', 'scale=-2:2160']);
-        } else if (requestedRes.contains('1440p') || requestedRes.contains('2.5K')) {
+        } else if (requestedRes.contains('1440p') ||
+            requestedRes.contains('2.5K')) {
           arguments.addAll(['-vf', 'scale=-2:1440']);
         } else if (requestedRes.contains('1080p')) {
           arguments.addAll(['-vf', 'scale=-2:1080']);
@@ -194,22 +214,43 @@ class EngineBridge {
 
       // 2. Video Codec Selection (Hardware vs Software)
       if (requestedCodec.contains('HEVC') || requestedCodec.contains('H.265')) {
-        if (!licenseService.isPro) throw Exception('HEVC / 4K encoding requires RetroFlux PRO.');
+        if (!licenseService.isPro) {
+          throw Exception('HEVC / 4K encoding requires RetroFlux PRO.');
+        }
         if (hwAccelEnabled && gpu.hasIntelQsv) {
-          arguments.addAll(['-c:v', 'hevc_qsv', '-global_quality', '23', '-preset', 'medium']);
+          arguments.addAll([
+            '-c:v',
+            'hevc_qsv',
+            '-global_quality',
+            '23',
+            '-preset',
+            'medium'
+          ]);
           task.statusDetail = 'Encoding HEVC via Intel QSV';
         } else if (hwAccelEnabled && gpu.hasNvidiaNvenc) {
-          arguments.addAll(['-c:v', 'hevc_nvenc', '-preset', 'p4', '-cq', '24']);
+          arguments
+              .addAll(['-c:v', 'hevc_nvenc', '-preset', 'p4', '-cq', '24']);
           task.statusDetail = 'Encoding HEVC via NVIDIA NVENC';
         } else if (hwAccelEnabled && gpu.hasAmdAmf) {
           arguments.addAll(['-c:v', 'hevc_amf', '-quality', 'quality']);
           task.statusDetail = 'Encoding HEVC via AMD AMF';
         } else {
-          arguments.addAll(['-c:v', 'libx265', '-crf', '24', '-preset', 'fast', '-threads', '0']);
+          arguments.addAll([
+            '-c:v',
+            'libx265',
+            '-crf',
+            '24',
+            '-preset',
+            'fast',
+            '-threads',
+            '0'
+          ]);
           task.statusDetail = 'Encoding HEVC via Multi-Threaded CPU';
         }
       } else if (requestedCodec.contains('AV1')) {
-        if (!licenseService.isPro) throw Exception('AV1 encoding requires RetroFlux PRO.');
+        if (!licenseService.isPro) {
+          throw Exception('AV1 encoding requires RetroFlux PRO.');
+        }
         if (hwAccelEnabled && gpu.hasIntelQsv) {
           arguments.addAll(['-c:v', 'av1_qsv', '-global_quality', '25']);
           task.statusDetail = 'Encoding AV1 via Intel QSV';
@@ -226,13 +267,23 @@ class EngineBridge {
           arguments.addAll(['-c:v', 'h264_qsv', '-global_quality', '21']);
           task.statusDetail = 'Encoding H.264 via Intel QSV';
         } else if (hwAccelEnabled && gpu.hasNvidiaNvenc) {
-          arguments.addAll(['-c:v', 'h264_nvenc', '-preset', 'p4', '-cq', '22']);
+          arguments
+              .addAll(['-c:v', 'h264_nvenc', '-preset', 'p4', '-cq', '22']);
           task.statusDetail = 'Encoding H.264 via NVIDIA NVENC';
         } else if (hwAccelEnabled && gpu.hasAmdAmf) {
           arguments.addAll(['-c:v', 'h264_amf', '-quality', 'quality']);
           task.statusDetail = 'Encoding H.264 via AMD AMF';
         } else {
-          arguments.addAll(['-c:v', 'libx264', '-crf', '22', '-preset', 'fast', '-threads', '0']);
+          arguments.addAll([
+            '-c:v',
+            'libx264',
+            '-crf',
+            '22',
+            '-preset',
+            'fast',
+            '-threads',
+            '0'
+          ]);
           task.statusDetail = 'Encoding H.264 via Multi-Threaded CPU';
         }
       }
@@ -276,7 +327,8 @@ class EngineBridge {
         final s = double.tryParse(timeMatch.group(3)!) ?? 0;
         final currentSeconds = (h * 3600) + (m * 60) + s;
 
-        final rawProgress = (currentSeconds / totalDurationSeconds).clamp(0.0, 0.99);
+        final rawProgress =
+            (currentSeconds / totalDurationSeconds).clamp(0.0, 0.99);
         task.progress = rawProgress;
         onProgress?.call(rawProgress);
       }
@@ -299,12 +351,14 @@ class EngineBridge {
     }
 
     task.progress = 1.0;
-    task.statusDetail = isLosslessRemux ? 'Lossless Remux Complete' : 'Encoding Complete';
+    task.statusDetail =
+        isLosslessRemux ? 'Lossless Remux Complete' : 'Encoding Complete';
     onProgress?.call(1.0);
   }
 
   // --- Fallback Passthrough ---
-  Future<void> _executePassthroughFallback(ConversionTask task, void Function(double progress)? onProgress) async {
+  Future<void> _executePassthroughFallback(
+      ConversionTask task, void Function(double progress)? onProgress) async {
     onProgress?.call(0.5);
     final src = File(task.inputPath);
     final dst = File(task.outputPath);
@@ -323,7 +377,8 @@ class EngineBridge {
 
     // 1. Check WinGet Links
     if (Platform.isWindows) {
-      const winGetPath = r'C:\Users\bonno\AppData\Local\Microsoft\WinGet\Links\ffmpeg.exe';
+      const winGetPath =
+          r'C:\Users\bonno\AppData\Local\Microsoft\WinGet\Links\ffmpeg.exe';
       if (File(winGetPath).existsSync()) {
         _cachedFfmpegPath = winGetPath;
         return winGetPath;
@@ -346,7 +401,8 @@ class EngineBridge {
     return null;
   }
 
-  static Future<GpuCapabilities> detectGpuCapabilities([String? ffmpegPath]) async {
+  static Future<GpuCapabilities> detectGpuCapabilities(
+      [String? ffmpegPath]) async {
     if (_cachedGpu != null) return _cachedGpu!;
 
     final path = ffmpegPath ?? await resolveFfmpegPath();
@@ -358,9 +414,12 @@ class EngineBridge {
       final res = await Process.run(path, ['-encoders']);
       final stdout = res.stdout.toString().toLowerCase();
 
-      final hasIntelQsv = stdout.contains('hevc_qsv') || stdout.contains('h264_qsv');
-      final hasNvidiaNvenc = stdout.contains('hevc_nvenc') || stdout.contains('h264_nvenc');
-      final hasAmdAmf = stdout.contains('hevc_amf') || stdout.contains('h264_amf');
+      final hasIntelQsv =
+          stdout.contains('hevc_qsv') || stdout.contains('h264_qsv');
+      final hasNvidiaNvenc =
+          stdout.contains('hevc_nvenc') || stdout.contains('h264_nvenc');
+      final hasAmdAmf =
+          stdout.contains('hevc_amf') || stdout.contains('h264_amf');
       final hasAppleVideoToolbox = stdout.contains('videotoolbox');
 
       _cachedGpu = GpuCapabilities(

@@ -107,7 +107,8 @@ class WorkerIsolatePool {
   bool get hasActiveTasks => _activeWorkers > 0 || _queue.isNotEmpty;
 
   /// Enqueues a task and returns a progress stream
-  Stream<double> enqueueTask(ConversionTask task, {required Future<void> Function(ConversionTask) onExecute}) {
+  Stream<double> enqueueTask(ConversionTask task,
+      {required Future<void> Function(ConversionTask) onExecute}) {
     final controller = StreamController<double>.broadcast();
     _progressControllers[task.id] = controller;
     _queue.add(task);
@@ -160,7 +161,8 @@ class WorkerIsolatePool {
         return;
       }
 
-      payload.sendPort.send(IsolateProgressMessage(taskId: payload.taskId, progress: 0.25));
+      payload.sendPort
+          .send(IsolateProgressMessage(taskId: payload.taskId, progress: 0.25));
 
       final Uint8List bytes = inputFile.readAsBytesSync();
       final img.Image? decoded = img.decodeImage(bytes);
@@ -174,7 +176,8 @@ class WorkerIsolatePool {
         return;
       }
 
-      payload.sendPort.send(IsolateProgressMessage(taskId: payload.taskId, progress: 0.65));
+      payload.sendPort
+          .send(IsolateProgressMessage(taskId: payload.taskId, progress: 0.65));
 
       final format = payload.targetFormat.toLowerCase();
       Uint8List encodedBytes;
@@ -187,11 +190,13 @@ class WorkerIsolatePool {
           break;
         case 'jpg':
         case 'jpeg':
-          encodedBytes = Uint8List.fromList(img.encodeJpg(decoded, quality: quality));
+          encodedBytes =
+              Uint8List.fromList(img.encodeJpg(decoded, quality: quality));
           break;
         case 'webp':
           // Using lossy/lossless WebP encoding
-          encodedBytes = Uint8List.fromList(img.encodeJpg(decoded, quality: quality));
+          encodedBytes =
+              Uint8List.fromList(img.encodeJpg(decoded, quality: quality));
           break;
         case 'bmp':
           encodedBytes = Uint8List.fromList(img.encodeBmp(decoded));
@@ -203,7 +208,8 @@ class WorkerIsolatePool {
           encodedBytes = Uint8List.fromList(img.encodePng(decoded));
       }
 
-      payload.sendPort.send(IsolateProgressMessage(taskId: payload.taskId, progress: 0.90));
+      payload.sendPort
+          .send(IsolateProgressMessage(taskId: payload.taskId, progress: 0.90));
 
       final outputFile = File(payload.outputPath);
       outputFile.parent.createSync(recursive: true);

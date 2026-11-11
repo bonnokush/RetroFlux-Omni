@@ -49,8 +49,10 @@ class RetroFluxOmniApp extends ConsumerWidget {
 
     return DynamicColorBuilder(
       builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
-        final darkColorScheme = themeSettings.useSystemWallpaper ? darkDynamic : null;
-        final lightColorScheme = themeSettings.useSystemWallpaper ? lightDynamic : null;
+        final darkColorScheme =
+            themeSettings.useSystemWallpaper ? darkDynamic : null;
+        final lightColorScheme =
+            themeSettings.useSystemWallpaper ? lightDynamic : null;
 
         final darkTheme = ThemeController.buildTheme(
           seedColor: themeSettings.seedColor,

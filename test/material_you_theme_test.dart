@@ -11,7 +11,9 @@ void main() {
   });
 
   group('Google Pixel Material You Dynamic Theming Tests', () {
-    test('1. ThemeController initializes with default Lavender and updates seeds', () async {
+    test(
+        '1. ThemeController initializes with default Lavender and updates seeds',
+        () async {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
@@ -27,13 +29,16 @@ void main() {
       expect(updated.seedColor, equals(PixelSeeds.bayBlue));
 
       await notifier.toggleSystemWallpaper(true);
-      expect(container.read(themeControllerProvider).useSystemWallpaper, isTrue);
+      expect(
+          container.read(themeControllerProvider).useSystemWallpaper, isTrue);
 
       await notifier.setThemeMode(ThemeMode.light);
-      expect(container.read(themeControllerProvider).themeMode, equals(ThemeMode.light));
+      expect(container.read(themeControllerProvider).themeMode,
+          equals(ThemeMode.light));
     });
 
-    testWidgets('2. Open Palette Switcher and verify Pixel Seeds', (WidgetTester tester) async {
+    testWidgets('2. Open Palette Switcher and verify Pixel Seeds',
+        (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1200, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());

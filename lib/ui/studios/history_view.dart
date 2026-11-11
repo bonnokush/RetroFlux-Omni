@@ -13,7 +13,8 @@ class HistoryView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tasks = ref.watch(taskQueueProvider);
-    final completedTasks = tasks.where((t) => t.status == TaskStatus.completed).toList();
+    final completedTasks =
+        tasks.where((t) => t.status == TaskStatus.completed).toList();
     final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
@@ -36,7 +37,8 @@ class HistoryView extends ConsumerWidget {
                     color: colorScheme.primaryContainer,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.history_rounded, color: colorScheme.primary, size: 24),
+                  child: Icon(Icons.history_rounded,
+                      color: colorScheme.primary, size: 24),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -55,7 +57,8 @@ class HistoryView extends ConsumerWidget {
                       const SizedBox(height: 3),
                       Text(
                         '${completedTasks.length} file(s) converted successfully in this session',
-                        style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+                        style: TextStyle(
+                            fontSize: 12, color: colorScheme.onSurfaceVariant),
                       ),
                     ],
                   ),
@@ -66,7 +69,8 @@ class HistoryView extends ConsumerWidget {
                     backgroundColor: colorScheme.surfaceContainerHigh,
                     padding: const EdgeInsets.all(12),
                   ),
-                  icon: Icon(Icons.palette_outlined, color: colorScheme.primary, size: 20),
+                  icon: Icon(Icons.palette_outlined,
+                      color: colorScheme.primary, size: 20),
                   onPressed: () => PaletteSwitcherSheet.show(context),
                 ),
                 if (completedTasks.isNotEmpty) ...[
@@ -74,13 +78,17 @@ class HistoryView extends ConsumerWidget {
                   FilledButton.tonalIcon(
                     style: FilledButton.styleFrom(
                       shape: const StadiumBorder(),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
                     ),
                     icon: const Icon(Icons.delete_outline, size: 18),
-                    label: const Text('Clear History', style: TextStyle(fontWeight: FontWeight.w700)),
+                    label: const Text('Clear History',
+                        style: TextStyle(fontWeight: FontWeight.w700)),
                     onPressed: () {
                       for (final task in completedTasks) {
-                        ref.read(taskQueueProvider.notifier).removeTask(task.id);
+                        ref
+                            .read(taskQueueProvider.notifier)
+                            .removeTask(task.id);
                       }
                     },
                   ),
@@ -102,17 +110,23 @@ class HistoryView extends ConsumerWidget {
                             color: colorScheme.surfaceContainerHigh,
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(Icons.history_toggle_off, size: 40, color: colorScheme.primary),
+                          child: Icon(Icons.history_toggle_off,
+                              size: 40, color: colorScheme.primary),
                         ),
                         const SizedBox(height: 16),
                         Text(
                           'No completed conversions yet',
-                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: colorScheme.onSurface),
+                          style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              color: colorScheme.onSurface),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Files you convert in Universal Batch or Studios will appear here',
-                          style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: colorScheme.onSurfaceVariant),
                         ),
                       ],
                     ),
@@ -123,7 +137,8 @@ class HistoryView extends ConsumerWidget {
                     itemBuilder: (context, idx) {
                       final task = completedTasks[idx];
                       return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 14),
                         decoration: BoxDecoration(
                           color: colorScheme.surfaceContainer,
                           borderRadius: BorderRadius.circular(20),
@@ -137,7 +152,9 @@ class HistoryView extends ConsumerWidget {
                                 color: colorScheme.secondaryContainer,
                                 shape: BoxShape.circle,
                               ),
-                              child: Icon(Icons.check_rounded, color: colorScheme.onSecondaryContainer, size: 20),
+                              child: Icon(Icons.check_rounded,
+                                  color: colorScheme.onSecondaryContainer,
+                                  size: 20),
                             ),
                             const SizedBox(width: 14),
                             Expanded(
@@ -146,23 +163,30 @@ class HistoryView extends ConsumerWidget {
                                 children: [
                                   Text(
                                     task.fileName,
-                                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: colorScheme.onSurface),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 13,
+                                        color: colorScheme.onSurface),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     'Converted to ${task.targetFormat.toUpperCase()} • Saved to ${task.outputPath}',
-                                    style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant),
+                                    style: TextStyle(
+                                        fontSize: 11,
+                                        color: colorScheme.onSurfaceVariant),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
                             ),
                             IconButton(
-                              icon: Icon(Icons.folder_open_outlined, color: colorScheme.primary, size: 20),
+                              icon: Icon(Icons.folder_open_outlined,
+                                  color: colorScheme.primary, size: 20),
                               tooltip: 'Open in Explorer',
                               onPressed: () {
                                 if (Platform.isWindows) {
-                                  Process.run('explorer.exe', ['/select,', task.outputPath]);
+                                  Process.run('explorer.exe',
+                                      ['/select,', task.outputPath]);
                                 }
                               },
                             ),

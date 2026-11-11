@@ -46,8 +46,23 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
       allowMultiple: true,
       type: FileType.custom,
       allowedExtensions: [
-        'mp4', 'mkv', 'mov', 'avi', 'webm', 'flv', 'wmv', 'ts', 'm4v',
-        'mp3', 'wav', 'aac', 'flac', 'm4a', 'ogg', 'opus', 'wma',
+        'mp4',
+        'mkv',
+        'mov',
+        'avi',
+        'webm',
+        'flv',
+        'wmv',
+        'ts',
+        'm4v',
+        'mp3',
+        'wav',
+        'aac',
+        'flac',
+        'm4a',
+        'ogg',
+        'opus',
+        'wma',
       ],
     );
 
@@ -59,16 +74,20 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
 
   void _applyBatchFormat(String targetFormat) {
     final tasks = ref.read(taskQueueProvider);
-    final mediaTasks = tasks.where((t) => t.category == TaskCategory.media).toList();
+    final mediaTasks =
+        tasks.where((t) => t.category == TaskCategory.media).toList();
     for (final task in mediaTasks) {
-      ref.read(taskQueueProvider.notifier).updateTaskTarget(task.id, targetFormat);
+      ref
+          .read(taskQueueProvider.notifier)
+          .updateTaskTarget(task.id, targetFormat);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final tasks = ref.watch(taskQueueProvider);
-    final mediaTasks = tasks.where((t) => t.category == TaskCategory.media).toList();
+    final mediaTasks =
+        tasks.where((t) => t.category == TaskCategory.media).toList();
     final isPro = ref.watch(licenseStateProvider) == LicenseTier.pro;
     final isProcessing = tasks.any((t) => t.status == TaskStatus.processing);
     final colorScheme = Theme.of(context).colorScheme;
@@ -88,7 +107,8 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeaderBanner(context, isPro, mediaTasks.length, colorScheme),
+                _buildHeaderBanner(
+                    context, isPro, mediaTasks.length, colorScheme),
                 const SizedBox(height: 16),
                 _buildSettingsDeck(context, isPro, colorScheme),
                 const SizedBox(height: 16),
@@ -97,7 +117,9 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
                 else ...[
                   _buildCompactDropZone(colorScheme),
                   const SizedBox(height: 16),
-                  Expanded(child: _buildMediaQueueList(mediaTasks, isPro, colorScheme)),
+                  Expanded(
+                      child:
+                          _buildMediaQueueList(mediaTasks, isPro, colorScheme)),
                 ],
                 const SizedBox(height: 16),
                 _buildBottomActionBar(mediaTasks, isProcessing, colorScheme),
@@ -110,7 +132,8 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
     );
   }
 
-  Widget _buildHeaderBanner(BuildContext context, bool isPro, int count, ColorScheme colorScheme) {
+  Widget _buildHeaderBanner(
+      BuildContext context, bool isPro, int count, ColorScheme colorScheme) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       decoration: BoxDecoration(
@@ -126,7 +149,8 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
               color: colorScheme.primaryContainer,
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.video_camera_back, color: colorScheme.primary, size: 24),
+            child: Icon(Icons.video_camera_back,
+                color: colorScheme.primary, size: 24),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -148,22 +172,30 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 3),
                       decoration: BoxDecoration(
-                        color: isPro ? colorScheme.secondaryContainer : colorScheme.surfaceContainerHighest,
+                        color: isPro
+                            ? colorScheme.secondaryContainer
+                            : colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
-                        isPro ? '⚡ PRO 4K UHD UNLOCKED' : 'FREE TIER (1080p CAP)',
+                        isPro
+                            ? '⚡ PRO 4K UHD UNLOCKED'
+                            : 'FREE TIER (1080p CAP)',
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
-                          color: isPro ? colorScheme.onSecondaryContainer : colorScheme.primary,
+                          color: isPro
+                              ? colorScheme.onSecondaryContainer
+                              : colorScheme.primary,
                         ),
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 3),
                       decoration: BoxDecoration(
                         color: colorScheme.surfaceContainerHigh,
                         borderRadius: BorderRadius.circular(16),
@@ -182,7 +214,8 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
                 const SizedBox(height: 4),
                 Text(
                   'Hardware-accelerated 4K encoding, AV1/HEVC, instant lossless remux & audio extraction • $count file(s) in queue',
-                  style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+                  style: TextStyle(
+                      fontSize: 12, color: colorScheme.onSurfaceVariant),
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -195,7 +228,8 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
               backgroundColor: colorScheme.surfaceContainerHigh,
               padding: const EdgeInsets.all(12),
             ),
-            icon: Icon(Icons.palette_outlined, color: colorScheme.primary, size: 20),
+            icon: Icon(Icons.palette_outlined,
+                color: colorScheme.primary, size: 20),
             onPressed: () => PaletteSwitcherSheet.show(context),
           ),
           const SizedBox(width: 8),
@@ -209,7 +243,10 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
             icon: const Icon(Icons.video_call_outlined, size: 18),
             label: const Text(
               'Add Media Files',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, letterSpacing: 0.1),
+              style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                  letterSpacing: 0.1),
             ),
             onPressed: _pickMediaFiles,
           ),
@@ -218,7 +255,8 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
     );
   }
 
-  Widget _buildSettingsDeck(BuildContext context, bool isPro, ColorScheme colorScheme) {
+  Widget _buildSettingsDeck(
+      BuildContext context, bool isPro, ColorScheme colorScheme) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       decoration: BoxDecoration(
@@ -234,7 +272,11 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Format: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colorScheme.onSurfaceVariant)),
+              Text('Format: ',
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurfaceVariant)),
               _buildTargetChip('MP4', 'mp4', colorScheme),
               _buildTargetChip('MKV', 'mkv', colorScheme),
               _buildTargetChip('MOV', 'mov', colorScheme),
@@ -249,7 +291,9 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: _losslessRemux ? colorScheme.primaryContainer.withOpacity(0.5) : Colors.transparent,
+              color: _losslessRemux
+                  ? colorScheme.primaryContainer.withOpacity(0.5)
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
@@ -258,7 +302,9 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
                 Icon(
                   Icons.bolt_rounded,
                   size: 16,
-                  color: _losslessRemux ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                  color: _losslessRemux
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant,
                 ),
                 const SizedBox(width: 4),
                 Text(
@@ -266,7 +312,9 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: _losslessRemux ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                    color: _losslessRemux
+                        ? colorScheme.primary
+                        : colorScheme.onSurfaceVariant,
                   ),
                 ),
                 Switch(
@@ -285,17 +333,26 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Codec: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colorScheme.onSurfaceVariant)),
+                Text('Codec: ',
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurfaceVariant)),
                 DropdownButton<String>(
                   value: _selectedCodec,
                   dropdownColor: colorScheme.surfaceContainerHigh,
-                  style: TextStyle(color: colorScheme.onSurface, fontSize: 12, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                      color: colorScheme.onSurface,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600),
                   underline: const SizedBox(),
                   items: [
                     'H.264 (Universal)',
                     'H.265 / HEVC ${isPro ? "" : "🔒 PRO"}',
                     'AV1 Modern ${isPro ? "" : "🔒 PRO"}',
-                  ].map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                  ]
+                      .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                      .toList(),
                   onChanged: (val) {
                     if (val != null) {
                       if (val.contains('PRO') && !isPro) {
@@ -313,11 +370,18 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Scale: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colorScheme.onSurfaceVariant)),
+                Text('Scale: ',
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurfaceVariant)),
                 DropdownButton<String>(
                   value: _selectedResolution,
                   dropdownColor: colorScheme.surfaceContainerHigh,
-                  style: TextStyle(color: colorScheme.onSurface, fontSize: 12, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                      color: colorScheme.onSurface,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600),
                   underline: const SizedBox(),
                   items: [
                     '4K UHD (2160p) ${isPro ? "" : "🔒 PRO"}',
@@ -325,7 +389,9 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
                     '1080p FHD',
                     '720p HD',
                     'Original Source',
-                  ].map((r) => DropdownMenuItem(value: r, child: Text(r))).toList(),
+                  ]
+                      .map((r) => DropdownMenuItem(value: r, child: Text(r)))
+                      .toList(),
                   onChanged: (val) {
                     if (val != null) {
                       if (val.contains('PRO') && !isPro) {
@@ -343,7 +409,11 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('GPU Accel: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colorScheme.onSurfaceVariant)),
+                Text('GPU Accel: ',
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurfaceVariant)),
                 Switch(
                   value: _hwAccel,
                   activeColor: colorScheme.primary,
@@ -366,7 +436,10 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
               ),
               child: Text(
                 '⚡ Instant Container Remux: Swaps container in ~1 sec with zero re-encoding loss',
-                style: TextStyle(fontSize: 11, color: colorScheme.primary, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                    fontSize: 11,
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.w600),
               ),
             ),
           ],
@@ -389,7 +462,10 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
           ),
           child: Text(
             label,
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: colorScheme.primary),
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: colorScheme.primary),
           ),
         ),
       ),
@@ -413,26 +489,33 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
                 color: colorScheme.primaryContainer,
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.movie_creation_outlined, color: colorScheme.primary, size: 36),
+              child: Icon(Icons.movie_creation_outlined,
+                  color: colorScheme.primary, size: 36),
             ),
             const SizedBox(height: 20),
             Text(
               'Drag & Drop 4K Videos or Audio Files Here',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: colorScheme.onSurface),
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: colorScheme.onSurface),
             ),
             const SizedBox(height: 8),
             Text(
               'MP4, MKV, MOV, WebM, AVI, TS, MP3, FLAC, WAV • Hardware GPU Accelerated',
-              style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
+              style:
+                  TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: 20),
             FilledButton.tonalIcon(
               style: FilledButton.styleFrom(
                 shape: const StadiumBorder(),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               ),
               icon: const Icon(Icons.file_upload_outlined, size: 18),
-              label: const Text('Browse Files', style: TextStyle(fontWeight: FontWeight.bold)),
+              label: const Text('Browse Files',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
               onPressed: _pickMediaFiles,
             ),
           ],
@@ -450,16 +533,21 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerLow,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.5)),
+          border:
+              Border.all(color: colorScheme.outlineVariant.withOpacity(0.5)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.add_circle_outline, color: colorScheme.primary, size: 20),
+            Icon(Icons.add_circle_outline,
+                color: colorScheme.primary, size: 20),
             const SizedBox(width: 10),
             Text(
               'Drop more media files or click to add',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colorScheme.primary),
+              style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.primary),
             ),
           ],
         ),
@@ -467,7 +555,8 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
     );
   }
 
-  Widget _buildMediaQueueList(List<ConversionTask> mediaTasks, bool isPro, ColorScheme colorScheme) {
+  Widget _buildMediaQueueList(
+      List<ConversionTask> mediaTasks, bool isPro, ColorScheme colorScheme) {
     return ListView.separated(
       itemCount: mediaTasks.length,
       separatorBuilder: (_, __) => const SizedBox(height: 10),
@@ -477,8 +566,18 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
     );
   }
 
-  Widget _buildMediaTaskItem(ConversionTask task, bool isPro, ColorScheme colorScheme) {
-    final availableTargets = ['mp4', 'mkv', 'mov', 'webm', 'mp3', 'wav', 'flac', 'aac'];
+  Widget _buildMediaTaskItem(
+      ConversionTask task, bool isPro, ColorScheme colorScheme) {
+    final availableTargets = [
+      'mp4',
+      'mkv',
+      'mov',
+      'webm',
+      'mp3',
+      'wav',
+      'flac',
+      'aac'
+    ];
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
@@ -498,7 +597,8 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
                   color: colorScheme.primaryContainer,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.movie_creation_outlined, color: colorScheme.primary, size: 20),
+                child: Icon(Icons.movie_creation_outlined,
+                    color: colorScheme.primary, size: 20),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -507,31 +607,42 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
                   children: [
                     Text(
                       task.fileName,
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: colorScheme.onSurface),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                          color: colorScheme.onSurface),
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
                     Text(
                       'Target: ${task.targetFormat.toUpperCase()} ${task.statusDetail != null ? "• ${task.statusDetail}" : ""}',
-                      style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant),
+                      style: TextStyle(
+                          fontSize: 11, color: colorScheme.onSurfaceVariant),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
-              Icon(Icons.arrow_forward_rounded, size: 16, color: colorScheme.onSurfaceVariant),
+              Icon(Icons.arrow_forward_rounded,
+                  size: 16, color: colorScheme.onSurfaceVariant),
               const SizedBox(width: 10),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
                 decoration: ShapeDecoration(
                   color: colorScheme.surfaceContainerHigh,
                   shape: const StadiumBorder(),
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
-                    value: availableTargets.contains(task.targetFormat) ? task.targetFormat : 'mp4',
+                    value: availableTargets.contains(task.targetFormat)
+                        ? task.targetFormat
+                        : 'mp4',
                     dropdownColor: colorScheme.surfaceContainerHigh,
-                    style: TextStyle(color: colorScheme.primary, fontSize: 12, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        color: colorScheme.primary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold),
                     items: availableTargets.map((target) {
                       return DropdownMenuItem(
                         value: target,
@@ -540,7 +651,9 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
                     }).toList(),
                     onChanged: (newFormat) {
                       if (newFormat != null) {
-                        ref.read(taskQueueProvider.notifier).updateTaskTarget(task.id, newFormat);
+                        ref
+                            .read(taskQueueProvider.notifier)
+                            .updateTaskTarget(task.id, newFormat);
                       }
                     },
                   ),
@@ -548,8 +661,10 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
               ),
               const SizedBox(width: 12),
               IconButton(
-                icon: Icon(Icons.close, size: 18, color: colorScheme.onSurfaceVariant),
-                onPressed: () => ref.read(taskQueueProvider.notifier).removeTask(task.id),
+                icon: Icon(Icons.close,
+                    size: 18, color: colorScheme.onSurfaceVariant),
+                onPressed: () =>
+                    ref.read(taskQueueProvider.notifier).removeTask(task.id),
               ),
             ],
           ),
@@ -562,15 +677,25 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
               children: [
                 Text(
                   '${(task.progress * 100).toStringAsFixed(0)}%',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: colorScheme.primary),
+                  style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.primary),
                 ),
                 Wrap(
                   spacing: 12,
                   children: [
                     if (task.fps != null)
-                      Text('🎬 ${task.fps!.toStringAsFixed(0)} FPS', style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant)),
+                      Text('🎬 ${task.fps!.toStringAsFixed(0)} FPS',
+                          style: TextStyle(
+                              fontSize: 11,
+                              color: colorScheme.onSurfaceVariant)),
                     if (task.speed != null)
-                      Text('⚡ Speed: ${task.speed}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: colorScheme.primary)),
+                      Text('⚡ Speed: ${task.speed}',
+                          style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: colorScheme.primary)),
                   ],
                 ),
               ],
@@ -589,11 +714,15 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
             const SizedBox(height: 8),
             Row(
               children: [
-                const Icon(Icons.check_circle_rounded, color: Colors.greenAccent, size: 16),
+                const Icon(Icons.check_circle_rounded,
+                    color: Colors.greenAccent, size: 16),
                 const SizedBox(width: 6),
                 Text(
                   task.statusDetail ?? 'Completed',
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.greenAccent),
+                  style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.greenAccent),
                 ),
               ],
             ),
@@ -601,12 +730,14 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
             const SizedBox(height: 8),
             Row(
               children: [
-                const Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 16),
+                const Icon(Icons.error_outline_rounded,
+                    color: Colors.redAccent, size: 16),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     task.errorMessage ?? 'Encoding failed',
-                    style: const TextStyle(fontSize: 11, color: Colors.redAccent),
+                    style:
+                        const TextStyle(fontSize: 11, color: Colors.redAccent),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -618,7 +749,8 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
     );
   }
 
-  Widget _buildBottomActionBar(List<ConversionTask> mediaTasks, bool isProcessing, ColorScheme colorScheme) {
+  Widget _buildBottomActionBar(List<ConversionTask> mediaTasks,
+      bool isProcessing, ColorScheme colorScheme) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       decoration: BoxDecoration(
@@ -630,7 +762,10 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
         children: [
           Text(
             '${mediaTasks.length} media file(s) in queue',
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colorScheme.onSurfaceVariant),
+            style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: colorScheme.onSurfaceVariant),
           ),
           FilledButton.tonalIcon(
             style: FilledButton.styleFrom(
@@ -644,11 +779,18 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
               padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 14),
             ),
             icon: isProcessing
-                ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: colorScheme.onPrimaryContainer))
+                ? SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: colorScheme.onPrimaryContainer))
                 : const Icon(Icons.play_arrow_rounded, size: 20),
             label: Text(
               isProcessing ? 'Encoding...' : 'Convert All Media',
-              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, letterSpacing: 0.1),
+              style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                  letterSpacing: 0.1),
             ),
             onPressed: isProcessing || mediaTasks.isEmpty
                 ? null
@@ -679,11 +821,15 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.video_library_outlined, color: colorScheme.primary, size: 54),
+              Icon(Icons.video_library_outlined,
+                  color: colorScheme.primary, size: 54),
               const SizedBox(height: 14),
               Text(
                 'DROP VIDEO & AUDIO FILES HERE',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: colorScheme.primary),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.primary),
               ),
             ],
           ),

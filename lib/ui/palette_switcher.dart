@@ -44,7 +44,8 @@ class PaletteSwitcherSheet extends ConsumerWidget {
             children: [
               Row(
                 children: [
-                  Icon(Icons.palette_outlined, color: colorScheme.primary, size: 24),
+                  Icon(Icons.palette_outlined,
+                      color: colorScheme.primary, size: 24),
                   const SizedBox(width: 12),
                   Text(
                     'Material You Palette',

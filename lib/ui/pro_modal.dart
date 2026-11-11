@@ -7,7 +7,8 @@ final licenseServiceProvider = Provider<LicenseService>((ref) {
   return LicenseService();
 });
 
-final licenseStateProvider = StateNotifierProvider<LicenseStateNotifier, LicenseTier>((ref) {
+final licenseStateProvider =
+    StateNotifierProvider<LicenseStateNotifier, LicenseTier>((ref) {
   final service = ref.watch(licenseServiceProvider);
   return LicenseStateNotifier(service);
 });
@@ -24,12 +25,12 @@ class LicenseStateNotifier extends StateNotifier<LicenseTier> {
     state = _service.currentTier;
   }
 
-  Future<bool> activateKey(String key) async {
-    final success = await _service.activateKey(key);
-    if (success) {
+  Future<ActivationResult> activateKey(String key) async {
+    final result = await _service.activateKey(key);
+    if (result.success) {
       state = _service.currentTier;
     }
-    return success;
+    return result;
   }
 
   Future<void> deactivate() async {
@@ -69,7 +70,7 @@ class _ProModalState extends ConsumerState<ProModal> {
   Future<void> _activate() async {
     final key = _keyController.text.trim();
     if (key.isEmpty) {
-      setState(() => _error = 'Please enter a license key');
+      setState(() => _error = 'Please enter your license key');
       return;
     }
 
@@ -78,20 +79,23 @@ class _ProModalState extends ConsumerState<ProModal> {
       _error = null;
     });
 
-    final success = await ref.read(licenseStateProvider.notifier).activateKey(key);
+    final result =
+        await ref.read(licenseStateProvider.notifier).activateKey(key);
 
     if (mounted) {
       setState(() => _isLoading = false);
-      if (success) {
+      if (result.success) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('RetroFlux PRO activated successfully!'),
+          SnackBar(
+            content: Text(
+              '⚡ RetroFlux PRO activated! ${result.customerName != null ? "Licensed to ${result.customerName}" : ""}',
+            ),
             backgroundColor: Colors.green,
           ),
         );
       } else {
-        setState(() => _error = 'Invalid license key signature');
+        setState(() => _error = result.errorMessage ?? 'Invalid license key');
       }
     }
   }
@@ -103,6 +107,7 @@ class _ProModalState extends ConsumerState<ProModal> {
   @override
   Widget build(BuildContext context) {
     final isPro = ref.watch(licenseStateProvider) == LicenseTier.pro;
+    final licenseService = ref.watch(licenseServiceProvider);
     final colorScheme = Theme.of(context).colorScheme;
 
     return Dialog(
@@ -112,7 +117,7 @@ class _ProModalState extends ConsumerState<ProModal> {
         borderRadius: BorderRadius.circular(28),
       ),
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 480),
+        constraints: const BoxConstraints(maxWidth: 500),
         padding: const EdgeInsets.all(28),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -128,7 +133,8 @@ class _ProModalState extends ConsumerState<ProModal> {
                     color: colorScheme.primaryContainer,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.workspace_premium, color: colorScheme.primary, size: 24),
+                  child: Icon(Icons.workspace_premium,
+                      color: colorScheme.primary, size: 24),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -137,11 +143,16 @@ class _ProModalState extends ConsumerState<ProModal> {
                     children: [
                       Text(
                         'RETROFLUX PRO 4.0',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 0.5, color: colorScheme.onSurface),
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                            color: colorScheme.onSurface),
                       ),
                       Text(
-                        'Offline High-Throughput Engine',
-                        style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+                        'Hardware-Accelerated 4K Engine',
+                        style: TextStyle(
+                            fontSize: 12, color: colorScheme.onSurfaceVariant),
                       ),
                     ],
                   ),
@@ -152,7 +163,7 @@ class _ProModalState extends ConsumerState<ProModal> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
 
             // Feature Comparison
             Container(
@@ -163,55 +174,145 @@ class _ProModalState extends ConsumerState<ProModal> {
               ),
               child: Column(
                 children: [
-                  _FeatureRow(icon: Icons.all_inclusive, text: 'Unlimited Batch Queue (vs. 3 on Free)', colorScheme: colorScheme),
+                  _FeatureRow(
+                      icon: Icons.hd,
+                      text: '4K Ultra HD Export (vs. 1080p Cap on Free)',
+                      colorScheme: colorScheme),
                   const SizedBox(height: 10),
-                  _FeatureRow(icon: Icons.hd, text: '4K Ultra HD Export (vs. 1080p Cap)', colorScheme: colorScheme),
+                  _FeatureRow(
+                      icon: Icons.bolt,
+                      text:
+                          'Intel QSV / NVIDIA NVENC / AMD AMF GPU Acceleration',
+                      colorScheme: colorScheme),
                   const SizedBox(height: 10),
-                  _FeatureRow(icon: Icons.memory, text: 'Hardware GPU Acceleration (NVENC/QSV/VideoToolbox)', colorScheme: colorScheme),
+                  _FeatureRow(
+                      icon: Icons.flash_on,
+                      text: 'Instant Lossless Remuxing (-c copy)',
+                      colorScheme: colorScheme),
                   const SizedBox(height: 10),
-                  _FeatureRow(icon: Icons.video_file, text: 'Next-Gen Codecs: AV1, HEVC, ProRes 422', colorScheme: colorScheme),
+                  _FeatureRow(
+                      icon: Icons.all_inclusive,
+                      text: 'Unlimited Batch Queue (vs. 3 items on Free)',
+                      colorScheme: colorScheme),
+                  const SizedBox(height: 10),
+                  _FeatureRow(
+                      icon: Icons.video_file,
+                      text: 'Next-Gen Codecs: AV1, HEVC, ProRes 422',
+                      colorScheme: colorScheme),
                 ],
               ),
             ),
             const SizedBox(height: 20),
 
             if (isPro) ...[
+              // Active License Card
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                 decoration: BoxDecoration(
                   color: colorScheme.secondaryContainer,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.verified, color: colorScheme.primary, size: 20),
-                    const SizedBox(width: 10),
+                    Icon(Icons.verified, color: colorScheme.primary, size: 22),
+                    const SizedBox(width: 12),
                     Expanded(
-                      child: Text(
-                        'License Active (Perpetual Offline)',
-                        style: TextStyle(color: colorScheme.onSecondaryContainer, fontWeight: FontWeight.bold, fontSize: 13),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'PRO Lifetime License Active',
+                            style: TextStyle(
+                                color: colorScheme.onSecondaryContainer,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13),
+                          ),
+                          if (licenseService.customerName != null)
+                            Text(
+                              licenseService.customerName!,
+                              style: TextStyle(
+                                  color: colorScheme.onSecondaryContainer
+                                      .withOpacity(0.8),
+                                  fontSize: 11),
+                            ),
+                        ],
                       ),
                     ),
                     TextButton(
                       style: TextButton.styleFrom(shape: const StadiumBorder()),
                       onPressed: () async {
-                        await ref.read(licenseStateProvider.notifier).deactivate();
+                        await ref
+                            .read(licenseStateProvider.notifier)
+                            .deactivate();
                         if (mounted) setState(() {});
                       },
-                      child: Text('Deactivate', style: TextStyle(color: colorScheme.error, fontSize: 12, fontWeight: FontWeight.bold)),
+                      child: Text('Deactivate',
+                          style: TextStyle(
+                              color: colorScheme.error,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
               ),
             ] else ...[
+              // Primary Lemon Squeezy Buy Button
+              FilledButton.icon(
+                style: FilledButton.styleFrom(
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
+                  shape: const StadiumBorder(),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                icon: const Icon(Icons.shopping_bag_outlined, size: 18),
+                label: const Text(
+                  'BUY RETROFLUX PRO ON LEMON SQUEEZY',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      letterSpacing: 0.5),
+                ),
+                onPressed: LicenseService.openCheckoutPage,
+              ),
+              const SizedBox(height: 16),
+
+              // Divider
+              Row(
+                children: [
+                  Expanded(child: Divider(color: colorScheme.outlineVariant)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      'OR ACTIVATE WITH LICENSE KEY',
+                      style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.onSurfaceVariant,
+                          letterSpacing: 0.5),
+                    ),
+                  ),
+                  Expanded(child: Divider(color: colorScheme.outlineVariant)),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // License Key Input
               TextField(
                 controller: _keyController,
-                style: TextStyle(fontFamily: 'Consolas', fontSize: 14, letterSpacing: 1, color: colorScheme.onSurface),
+                style: TextStyle(
+                    fontFamily: 'Consolas',
+                    fontSize: 13,
+                    letterSpacing: 0.5,
+                    color: colorScheme.onSurface),
                 decoration: InputDecoration(
-                  labelText: 'ENTER PRO LICENSE KEY',
-                  labelStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11),
-                  hintText: 'RFLX-PRO-XXXX-XXXX-XXXX',
-                  hintStyle: TextStyle(color: colorScheme.onSurfaceVariant.withOpacity(0.4)),
+                  labelText: 'ENTER LICENSE KEY',
+                  labelStyle: TextStyle(
+                      color: colorScheme.onSurfaceVariant, fontSize: 11),
+                  hintText: 'Paste Lemon Squeezy or Offline Key',
+                  hintStyle: TextStyle(
+                      color: colorScheme.onSurfaceVariant.withOpacity(0.4),
+                      fontSize: 12),
                   filled: true,
                   fillColor: colorScheme.surfaceContainerHigh,
                   errorText: _error,
@@ -221,31 +322,44 @@ class _ProModalState extends ConsumerState<ProModal> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
+                    borderSide:
+                        BorderSide(color: colorScheme.primary, width: 1.5),
                   ),
                 ),
               ),
               const SizedBox(height: 14),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton.icon(
                     style: TextButton.styleFrom(shape: const StadiumBorder()),
-                    icon: Icon(Icons.auto_fix_high, size: 14, color: colorScheme.primary),
-                    label: Text('Fill Dev License', style: TextStyle(color: colorScheme.primary, fontSize: 12, fontWeight: FontWeight.bold)),
+                    icon: Icon(Icons.auto_fix_high,
+                        size: 14, color: colorScheme.primary),
+                    label: Text('Fill Dev Key',
+                        style: TextStyle(
+                            color: colorScheme.primary,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold)),
                     onPressed: _fillDevKey,
                   ),
-                  FilledButton(
+                  FilledButton.tonal(
                     style: FilledButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: colorScheme.onPrimary,
                       shape: const StadiumBorder(),
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
                     ),
                     onPressed: _isLoading ? null : _activate,
                     child: _isLoading
-                        ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: colorScheme.onPrimary))
-                        : const Text('ACTIVATE', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+                        ? SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: colorScheme.primary))
+                        : const Text('ACTIVATE',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5)),
                   ),
                 ],
               ),
@@ -262,7 +376,8 @@ class _FeatureRow extends StatelessWidget {
   final String text;
   final ColorScheme colorScheme;
 
-  const _FeatureRow({required this.icon, required this.text, required this.colorScheme});
+  const _FeatureRow(
+      {required this.icon, required this.text, required this.colorScheme});
 
   @override
   Widget build(BuildContext context) {

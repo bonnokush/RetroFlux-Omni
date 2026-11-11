@@ -15,7 +15,8 @@ final engineBridgeProvider = Provider<EngineBridge>((ref) {
 });
 
 /// Task Queue Provider
-final taskQueueProvider = StateNotifierProvider<TaskQueueNotifier, List<ConversionTask>>((ref) {
+final taskQueueProvider =
+    StateNotifierProvider<TaskQueueNotifier, List<ConversionTask>>((ref) {
   final bridge = ref.watch(engineBridgeProvider);
   return TaskQueueNotifier(bridge, ref);
 });
@@ -80,7 +81,8 @@ class TaskQueueNotifier extends StateNotifier<List<ConversionTask>> {
     ];
   }
 
-  void updateTaskTarget(String taskId, String newFormat) => updateTargetFormat(taskId, newFormat);
+  void updateTaskTarget(String taskId, String newFormat) =>
+      updateTargetFormat(taskId, newFormat);
 
   void updateTaskOptions(String taskId, Map<String, dynamic> newOptions) {
     state = [
@@ -115,9 +117,11 @@ class TaskQueueNotifier extends StateNotifier<List<ConversionTask>> {
     state = [];
   }
 
-  Future<void> startBatchConversion([Map<String, dynamic>? globalOptions]) async {
+  Future<void> startBatchConversion(
+      [Map<String, dynamic>? globalOptions]) async {
     for (final task in state) {
-      if (task.status == TaskStatus.completed || task.status == TaskStatus.processing) {
+      if (task.status == TaskStatus.completed ||
+          task.status == TaskStatus.processing) {
         continue;
       }
 
@@ -143,7 +147,25 @@ class TaskQueueNotifier extends StateNotifier<List<ConversionTask>> {
   }
 
   TaskCategory _categorizeExtension(String ext) {
-    if (['mp4', 'mkv', 'mov', 'avi', 'webm', 'flv', 'wmv', 'ts', 'm4v', 'mp3', 'wav', 'aac', 'flac', 'm4a', 'ogg', 'opus', 'wma'].contains(ext)) {
+    if ([
+      'mp4',
+      'mkv',
+      'mov',
+      'avi',
+      'webm',
+      'flv',
+      'wmv',
+      'ts',
+      'm4v',
+      'mp3',
+      'wav',
+      'aac',
+      'flac',
+      'm4a',
+      'ogg',
+      'opus',
+      'wma'
+    ].contains(ext)) {
       return TaskCategory.media;
     }
     return TaskCategory.image;
@@ -154,7 +176,16 @@ class TaskQueueNotifier extends StateNotifier<List<ConversionTask>> {
       case TaskCategory.image:
         return sourceExt == 'png' ? 'jpg' : 'png';
       case TaskCategory.media:
-        final isAudio = ['mp3', 'wav', 'aac', 'flac', 'm4a', 'ogg', 'opus', 'wma'].contains(sourceExt);
+        final isAudio = [
+          'mp3',
+          'wav',
+          'aac',
+          'flac',
+          'm4a',
+          'ogg',
+          'opus',
+          'wma'
+        ].contains(sourceExt);
         if (isAudio) return sourceExt == 'mp3' ? 'wav' : 'mp3';
         return sourceExt == 'mp4' ? 'mkv' : 'mp4';
       case TaskCategory.data:
@@ -222,7 +253,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Top Status Banner: M3 Borderless Card (BorderRadius.circular(28))
-                    _buildHeaderBanner(context, isPro, tasks.length, colorScheme),
+                    _buildHeaderBanner(
+                        context, isPro, tasks.length, colorScheme),
                     const SizedBox(height: 12),
 
                     // Conversion Tasks Table / Centered Drop Zone
@@ -231,7 +263,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           ? _buildEmptyState(colorScheme)
                           : ListView.separated(
                               itemCount: tasks.length,
-                              separatorBuilder: (_, __) => const SizedBox(height: 8),
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(height: 8),
                               itemBuilder: (context, index) {
                                 final task = tasks[index];
                                 return _TaskCard(task: task);
@@ -260,7 +293,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.file_download_outlined, color: colorScheme.primary, size: 56),
+                          Icon(Icons.file_download_outlined,
+                              color: colorScheme.primary, size: 56),
                           const SizedBox(height: 16),
                           Text(
                             'DROP FILES HERE TO ENQUEUE',
@@ -283,7 +317,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildHeaderBanner(BuildContext context, bool isPro, int queueCount, ColorScheme colorScheme) {
+  Widget _buildHeaderBanner(BuildContext context, bool isPro, int queueCount,
+      ColorScheme colorScheme) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final content = Column(
@@ -296,12 +331,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               children: [
                 Text(
                   'Universal Conversion Engine',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: colorScheme.onSurface),
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: colorScheme.onSurface),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                   decoration: BoxDecoration(
-                    color: isPro ? colorScheme.secondaryContainer : colorScheme.surfaceContainerHighest,
+                    color: isPro
+                        ? colorScheme.secondaryContainer
+                        : colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
@@ -309,7 +350,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      color: isPro ? colorScheme.onSecondaryContainer : colorScheme.primary,
+                      color: isPro
+                          ? colorScheme.onSecondaryContainer
+                          : colorScheme.primary,
                     ),
                   ),
                 ),
@@ -318,7 +361,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             const SizedBox(height: 4),
             Text(
               'Media, Images, Documents, and Data • Queue: $queueCount items',
-              style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+              style:
+                  TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
               overflow: TextOverflow.ellipsis,
             ),
           ],
@@ -333,7 +377,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 backgroundColor: colorScheme.surfaceContainerHigh,
                 padding: const EdgeInsets.all(12),
               ),
-              icon: Icon(Icons.palette_outlined, color: colorScheme.primary, size: 20),
+              icon: Icon(Icons.palette_outlined,
+                  color: colorScheme.primary, size: 20),
               onPressed: () => PaletteSwitcherSheet.show(context),
             ),
             const SizedBox(width: 8),
@@ -342,10 +387,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 backgroundColor: colorScheme.primary,
                 foregroundColor: colorScheme.onPrimary,
                 shape: const StadiumBorder(),
-                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
               ),
               icon: const Icon(Icons.add, size: 18),
-              label: const Text('Add Files', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+              label: const Text('Add Files',
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
               onPressed: _pickFiles,
             ),
           ],
@@ -372,7 +419,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         color: colorScheme.primaryContainer,
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(Icons.flash_on, color: colorScheme.primary, size: 20),
+                      child: Icon(Icons.flash_on,
+                          color: colorScheme.primary, size: 20),
                     ),
                     const SizedBox(width: 12),
                     Expanded(child: content),
@@ -400,7 +448,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   color: colorScheme.primaryContainer,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.flash_on, color: colorScheme.primary, size: 24),
+                child:
+                    Icon(Icons.flash_on, color: colorScheme.primary, size: 24),
               ),
               const SizedBox(width: 16),
               Expanded(child: content),
@@ -434,17 +483,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     color: colorScheme.surfaceContainerHigh,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.file_upload_outlined, size: 30, color: colorScheme.primary),
+                  child: Icon(Icons.file_upload_outlined,
+                      size: 30, color: colorScheme.primary),
                 ),
                 const SizedBox(height: 14),
                 Text(
                   'Queue is empty',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: colorScheme.onSurface),
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: colorScheme.onSurface),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'Drag and drop files here or click "Add Files" above',
-                  style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+                  style: TextStyle(
+                      fontSize: 12, color: colorScheme.onSurfaceVariant),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 18),
@@ -499,7 +553,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ),
       icon: const Icon(Icons.clear_all, size: 18),
       label: const Text('Clear Queue'),
-      onPressed: tasks.isEmpty || hasProcessing ? null : () => ref.read(taskQueueProvider.notifier).clearQueue(),
+      onPressed: tasks.isEmpty || hasProcessing
+          ? null
+          : () => ref.read(taskQueueProvider.notifier).clearQueue(),
     );
 
     final convertBtn = FilledButton.tonalIcon(
@@ -514,11 +570,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 14),
       ),
       icon: hasProcessing
-          ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: colorScheme.onPrimaryContainer))
+          ? SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                  strokeWidth: 2, color: colorScheme.onPrimaryContainer))
           : const Icon(Icons.play_arrow_rounded, size: 20),
       label: Text(
         hasProcessing ? 'CONVERTING...' : 'START BATCH CONVERSION',
-        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, letterSpacing: 0.1),
+        style: const TextStyle(
+            fontWeight: FontWeight.w700, fontSize: 13, letterSpacing: 0.1),
       ),
       onPressed: !hasQueued || hasProcessing
           ? null
@@ -593,13 +654,17 @@ class _TaskCard extends ConsumerWidget {
                   children: [
                     Text(
                       task.fileName,
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: colorScheme.onSurface),
+                      style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: colorScheme.onSurface),
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
                     Text(
                       '${(task.fileSizeBytes / (1024 * 1024)).toStringAsFixed(2)} MB • Path: ${task.inputPath}',
-                      style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant),
+                      style: TextStyle(
+                          fontSize: 11, color: colorScheme.onSurfaceVariant),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
@@ -614,8 +679,11 @@ class _TaskCard extends ConsumerWidget {
               _buildStatusWidget(task, colorScheme),
 
               IconButton(
-                icon: Icon(Icons.close, size: 18, color: colorScheme.onSurfaceVariant),
-                onPressed: task.status == TaskStatus.processing ? null : () => notifier.removeTask(task.id),
+                icon: Icon(Icons.close,
+                    size: 18, color: colorScheme.onSurfaceVariant),
+                onPressed: task.status == TaskStatus.processing
+                    ? null
+                    : () => notifier.removeTask(task.id),
               ),
             ],
           ),
@@ -638,7 +706,8 @@ class _TaskCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildCategoryIcon(TaskCategory cat, String fileName, ColorScheme colorScheme) {
+  Widget _buildCategoryIcon(
+      TaskCategory cat, String fileName, ColorScheme colorScheme) {
     IconData icon;
     final ext = fileName.split('.').last.toLowerCase();
 
@@ -678,7 +747,8 @@ class _TaskCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildFormatDropdown(ConversionTask task, TaskQueueNotifier notifier, ColorScheme colorScheme) {
+  Widget _buildFormatDropdown(ConversionTask task, TaskQueueNotifier notifier,
+      ColorScheme colorScheme) {
     List<String> options = [];
     final ext = task.fileName.split('.').last.toLowerCase();
 
@@ -696,7 +766,17 @@ class _TaskCard extends ConsumerWidget {
           options = ['webp', 'png', 'jpg', 'bmp', 'ico', 'gif'];
           break;
         case TaskCategory.media:
-          options = ['mp4', 'mkv', 'mov', 'webm', 'mp3', 'wav', 'aac', 'flac', 'gif'];
+          options = [
+            'mp4',
+            'mkv',
+            'mov',
+            'webm',
+            'mp3',
+            'wav',
+            'aac',
+            'flac',
+            'gif'
+          ];
           break;
         case TaskCategory.data:
           options = ['json', 'csv', 'xlsx', 'pdf'];
@@ -715,10 +795,18 @@ class _TaskCard extends ConsumerWidget {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          value: options.contains(task.targetFormat) ? task.targetFormat : options.first,
+          value: options.contains(task.targetFormat)
+              ? task.targetFormat
+              : options.first,
           dropdownColor: colorScheme.surfaceContainerHigh,
-          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colorScheme.primary),
-          items: options.map((f) => DropdownMenuItem(value: f, child: Text(f.toUpperCase()))).toList(),
+          style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: colorScheme.primary),
+          items: options
+              .map((f) =>
+                  DropdownMenuItem(value: f, child: Text(f.toUpperCase())))
+              .toList(),
           onChanged: task.status == TaskStatus.processing
               ? null
               : (newVal) {
@@ -734,12 +822,18 @@ class _TaskCard extends ConsumerWidget {
   Widget _buildStatusWidget(ConversionTask task, ColorScheme colorScheme) {
     switch (task.status) {
       case TaskStatus.queued:
-        return Text('Queued', style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12));
+        return Text('Queued',
+            style:
+                TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12));
       case TaskStatus.processing:
         return Text('${(task.progress * 100).toInt()}%',
-            style: TextStyle(color: colorScheme.primary, fontSize: 12, fontWeight: FontWeight.bold));
+            style: TextStyle(
+                color: colorScheme.primary,
+                fontSize: 12,
+                fontWeight: FontWeight.bold));
       case TaskStatus.completed:
-        return Icon(Icons.check_circle_outline, color: colorScheme.primary, size: 20);
+        return Icon(Icons.check_circle_outline,
+            color: colorScheme.primary, size: 20);
       case TaskStatus.failed:
         return Tooltip(
           message: 'Conversion error',

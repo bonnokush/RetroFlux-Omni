@@ -11,7 +11,8 @@ void main() {
   });
 
   group('RetroFlux-Omni End-to-End Automated UI & Behavior Audit', () {
-    testWidgets('1. Launch & Render Tree Integrity Test', (WidgetTester tester) async {
+    testWidgets('1. Launch & Render Tree Integrity Test',
+        (WidgetTester tester) async {
       // Set desktop-like constraints (1100x720)
       tester.view.physicalSize = const Size(1100, 720);
       tester.view.devicePixelRatio = 1.0;
@@ -32,7 +33,8 @@ void main() {
       expect(find.text('Queue is empty'), findsOneWidget);
     });
 
-    testWidgets('2. Sidebar Navigation and View Switching Audit', (WidgetTester tester) async {
+    testWidgets('2. Sidebar Navigation and View Switching Audit',
+        (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1100, 720);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());
@@ -69,7 +71,8 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('3. Free Tier Batch Limit & Overflow Audit', (WidgetTester tester) async {
+    testWidgets('3. Free Tier Batch Limit & Overflow Audit',
+        (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1100, 720);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());
@@ -92,7 +95,7 @@ void main() {
         'C:/mock/video2.mp4',
         'C:/mock/image3.png',
         'C:/mock/document4.json', // 4th item - should be blocked
-        'C:/mock/audio5.wav',     // 5th item - should be blocked
+        'C:/mock/audio5.wav', // 5th item - should be blocked
       ]);
       await tester.pumpAndSettle();
 
@@ -106,7 +109,8 @@ void main() {
       expect(find.textContaining('Queue: 3 items'), findsOneWidget);
     });
 
-    testWidgets('4. PRO Modal Activation & Unlimited Queue Unlock Audit', (WidgetTester tester) async {
+    testWidgets('4. PRO Modal Activation & Unlimited Queue Unlock Audit',
+        (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1100, 720);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());
@@ -130,7 +134,8 @@ void main() {
 
       // Verify PRO modal opened cleanly
       expect(find.text('RETROFLUX PRO 4.0'), findsOneWidget);
-      expect(find.text('Unlimited Batch Queue (vs. 3 on Free)'), findsOneWidget);
+      expect(
+          find.text('Unlimited Batch Queue (vs. 3 on Free)'), findsOneWidget);
       expect(find.text('4K Ultra HD Export (vs. 1080p Cap)'), findsOneWidget);
 
       // Click "Fill Dev License"
@@ -165,7 +170,8 @@ void main() {
       expect(find.textContaining('Queue: 5 items'), findsOneWidget);
     });
 
-    testWidgets('5. Mobile Responsive Layout Transition Audit', (WidgetTester tester) async {
+    testWidgets('5. Mobile Responsive Layout Transition Audit',
+        (WidgetTester tester) async {
       // Simulate mobile portrait dimensions (390x844)
       tester.view.physicalSize = const Size(390, 844);
       tester.view.devicePixelRatio = 1.0;

@@ -7,9 +7,12 @@ class RetroFluxTheme {
   static const Color background = Color(0xFF121316); // Deep neutral surface
   static const Color surface = Color(0xFF121316);
   static const Color surfaceContainerLow = Color(0xFF16181C);
-  static const Color surfaceContainer = Color(0xFF1A1C20); // Elevated cards & panels
-  static const Color surfaceContainerHigh = Color(0xFF282A2F); // Elevated drop zones & interactive blocks
-  static const Color surfaceContainerHighest = Color(0xFF33353A); // Chips & search pills
+  static const Color surfaceContainer =
+      Color(0xFF1A1C20); // Elevated cards & panels
+  static const Color surfaceContainerHigh =
+      Color(0xFF282A2F); // Elevated drop zones & interactive blocks
+  static const Color surfaceContainerHighest =
+      Color(0xFF33353A); // Chips & search pills
 
   // Backward compatibility alias for cards & borders
   static const Color card = Color(0xFF1A1C20);
@@ -18,10 +21,14 @@ class RetroFluxTheme {
   static const Color cardBorderGlow = Color(0xFF383B42);
 
   // 2. Material You Primary & Accent Tonal Colors
-  static const Color primary = Color(0xFFD0BCFF); // Material You Lavender / Purple
-  static const Color onPrimary = Color(0xFF381E72); // Deep purple high-contrast text on primary
-  static const Color primaryContainer = Color(0xFF4F378B); // Pill container background for active items
-  static const Color onPrimaryContainer = Color(0xFFEADDFF); // Text & icon on active pill
+  static const Color primary =
+      Color(0xFFD0BCFF); // Material You Lavender / Purple
+  static const Color onPrimary =
+      Color(0xFF381E72); // Deep purple high-contrast text on primary
+  static const Color primaryContainer =
+      Color(0xFF4F378B); // Pill container background for active items
+  static const Color onPrimaryContainer =
+      Color(0xFFEADDFF); // Text & icon on active pill
 
   // Secondary & Tertiary
   static const Color secondaryContainer = Color(0xFF4A4458);
@@ -145,7 +152,8 @@ class RetroFluxTheme {
           elevation: 0,
           shape: const StadiumBorder(),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.1),
+          textStyle: const TextStyle(
+              fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.1),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
