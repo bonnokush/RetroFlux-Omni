@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:retroflux_omni/main.dart';
 import 'package:retroflux_omni/ui/dashboard_screen.dart';
-import 'package:retroflux_omni/core/license_service.dart';
 
 void main() {
   setUp(() {
@@ -29,7 +28,7 @@ void main() {
       expect(find.text('RETROFLUX'), findsOneWidget);
       expect(find.text('OMNI 4.0 PRO'), findsOneWidget);
       expect(find.text('Universal Conversion Engine'), findsOneWidget);
-      expect(find.text('FREE TIER (MAX 3)'), findsOneWidget);
+      expect(find.text('PRO UNLIMITED'), findsOneWidget);
       expect(find.text('Queue is empty'), findsOneWidget);
     });
 
@@ -71,7 +70,7 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('3. Free Tier Batch Limit & Overflow Audit',
+    testWidgets('3. Microsoft Store Edition Unlimited Batch Queue Audit',
         (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1100, 720);
       tester.view.devicePixelRatio = 1.0;
@@ -88,75 +87,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Simulate adding 5 files to the queue while on Free Tier (limit is 3)
-      final notifier = container.read(taskQueueProvider.notifier);
-      await notifier.addFiles([
-        'C:/mock/video1.mp4',
-        'C:/mock/video2.mp4',
-        'C:/mock/image3.png',
-        'C:/mock/document4.json', // 4th item - should be blocked
-        'C:/mock/audio5.wav', // 5th item - should be blocked
-      ]);
-      await tester.pumpAndSettle();
-
-      // Assert queue capped exactly at 3 items
-      final tasks = container.read(taskQueueProvider);
-      expect(tasks.length, equals(3));
-      expect(find.text('video1.mp4'), findsOneWidget);
-      expect(find.text('video2.mp4'), findsOneWidget);
-      expect(find.text('image3.png'), findsOneWidget);
-      expect(find.text('document4.json'), findsNothing);
-      expect(find.textContaining('Queue: 3 items'), findsOneWidget);
-    });
-
-    testWidgets('4. PRO Modal Activation & Unlimited Queue Unlock Audit',
-        (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(1100, 720);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(() => tester.view.resetPhysicalSize());
-
-      final container = ProviderContainer();
-      addTearDown(container.dispose);
-
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: const RetroFluxOmniApp(),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      // Click PRO license upgrade trigger in sidebar
-      final proCard = find.text('FREE TIER');
-      expect(proCard, findsOneWidget);
-      await tester.tap(proCard);
-      await tester.pumpAndSettle();
-
-      // Verify PRO modal opened cleanly
-      expect(find.text('RETROFLUX PRO 4.0'), findsOneWidget);
-      expect(find.text('Unlimited Batch Queue (vs. 3 items on Free)'),
-          findsOneWidget);
-      expect(find.text('4K Ultra HD Export (vs. 1080p Cap on Free)'),
-          findsOneWidget);
-
-      // Enter test license key into text field
-      final inputField = find.byType(TextField);
-      expect(inputField, findsOneWidget);
-      await tester.enterText(
-          inputField, LicenseService.generateValidDevKey());
-      await tester.pumpAndSettle();
-
-      // Click "ACTIVATE LICENSE"
-      final activateBtn = find.text('ACTIVATE LICENSE');
-      expect(activateBtn, findsOneWidget);
-      await tester.tap(activateBtn);
-      await tester.pumpAndSettle();
-
-      // Verify PRO tier status is active
-      expect(find.text('PRO UNLIMITED'), findsOneWidget);
-      expect(find.text('PRO ACTIVE'), findsOneWidget);
-
-      // Now add 5 files to test that queue is no longer capped at 3
+      // In Microsoft Store Edition, all 5 files are accepted immediately without arbitrary caps
       final notifier = container.read(taskQueueProvider.notifier);
       await notifier.addFiles([
         'C:/mock/video1.mp4',
@@ -167,9 +98,50 @@ void main() {
       ]);
       await tester.pumpAndSettle();
 
+      // Assert all 5 files in queue
       final tasks = container.read(taskQueueProvider);
       expect(tasks.length, equals(5));
+      expect(find.text('video1.mp4'), findsOneWidget);
+      expect(find.text('video2.mp4'), findsOneWidget);
+      expect(find.text('image3.png'), findsOneWidget);
+      expect(find.text('document4.json'), findsOneWidget);
+      expect(find.text('audio5.wav'), findsOneWidget);
       expect(find.textContaining('Queue: 5 items'), findsOneWidget);
+    });
+
+    testWidgets('4. PRO Status Dialog & Microsoft Store Verification Audit',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1100, 720);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.resetPhysicalSize());
+
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const RetroFluxOmniApp(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Verify PRO license card is active in sidebar
+      final proCard = find.text('PRO ACTIVE');
+      expect(proCard, findsOneWidget);
+      await tester.tap(proCard);
+      await tester.pumpAndSettle();
+
+      // Verify PRO modal opened cleanly
+      expect(find.text('RETROFLUX PRO 4.0'), findsOneWidget);
+      expect(find.text('Full Lifetime Access Unlocked'), findsOneWidget);
+      expect(find.text('4K Ultra HD Export (Up to 2160p 60FPS)'), findsOneWidget);
+
+      // Close modal
+      final doneBtn = find.text('DONE');
+      expect(doneBtn, findsOneWidget);
+      await tester.tap(doneBtn);
+      await tester.pumpAndSettle();
     });
 
     testWidgets('5. Mobile Responsive Layout Transition Audit',

@@ -27,9 +27,7 @@ class LicenseStateNotifier extends StateNotifier<LicenseTier> {
 
   Future<ActivationResult> activateKey(String key) async {
     final result = await _service.activateKey(key);
-    if (result.success) {
-      state = _service.currentTier;
-    }
+    state = _service.currentTier;
     return result;
   }
 
@@ -39,9 +37,8 @@ class LicenseStateNotifier extends StateNotifier<LicenseTier> {
   }
 }
 
-/// PRO License Key Activation Modal Dialog
-/// Material 3 Dialog (BorderRadius.circular(28) & Zero Outline)
-class ProModal extends ConsumerStatefulWidget {
+/// RetroFlux Omni PRO Status Dialog (Option 1: Microsoft Store Edition)
+class ProModal extends ConsumerWidget {
   const ProModal({super.key});
 
   static Future<void> show(BuildContext context) {
@@ -53,57 +50,7 @@ class ProModal extends ConsumerStatefulWidget {
   }
 
   @override
-  ConsumerState<ProModal> createState() => _ProModalState();
-}
-
-class _ProModalState extends ConsumerState<ProModal> {
-  final TextEditingController _keyController = TextEditingController();
-  bool _isLoading = false;
-  String? _error;
-
-  @override
-  void dispose() {
-    _keyController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _activate() async {
-    final key = _keyController.text.trim();
-    if (key.isEmpty) {
-      setState(() => _error = 'Please enter your license key');
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    final result =
-        await ref.read(licenseStateProvider.notifier).activateKey(key);
-
-    if (mounted) {
-      setState(() => _isLoading = false);
-      if (result.success) {
-        Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              '⚡ RetroFlux PRO activated! ${result.customerName != null ? "Licensed to ${result.customerName}" : ""}',
-            ),
-            backgroundColor: Colors.green,
-          ),
-        );
-      } else {
-        setState(() => _error = result.errorMessage ?? 'Invalid license key');
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isPro = ref.watch(licenseStateProvider) == LicenseTier.pro;
-    final licenseService = ref.watch(licenseServiceProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Dialog(
@@ -119,7 +66,7 @@ class _ProModalState extends ConsumerState<ProModal> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header with PRO badge
+            // Header with Icon
             Row(
               children: [
                 ClipRRect(
@@ -145,7 +92,7 @@ class _ProModalState extends ConsumerState<ProModal> {
                             color: colorScheme.onSurface),
                       ),
                       Text(
-                        'Hardware-Accelerated 4K Engine',
+                        'Microsoft Store Edition • Lifetime License Active',
                         style: TextStyle(
                             fontSize: 12, color: colorScheme.onSurfaceVariant),
                       ),
@@ -160,7 +107,44 @@ class _ProModalState extends ConsumerState<ProModal> {
             ),
             const SizedBox(height: 18),
 
-            // Feature Comparison
+            // Active License Card
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: colorScheme.secondaryContainer,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.verified, color: colorScheme.primary, size: 22),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Full Lifetime Access Unlocked',
+                          style: TextStyle(
+                              color: colorScheme.onSecondaryContainer,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13),
+                        ),
+                        Text(
+                          'Verified via Microsoft Store • Zero Telemetry',
+                          style: TextStyle(
+                              color: colorScheme.onSecondaryContainer
+                                  .withOpacity(0.8),
+                              fontSize: 11),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Feature List
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -171,183 +155,53 @@ class _ProModalState extends ConsumerState<ProModal> {
                 children: [
                   _FeatureRow(
                       icon: Icons.hd,
-                      text: '4K Ultra HD Export (vs. 1080p Cap on Free)',
+                      text: '4K Ultra HD Export (Up to 2160p 60FPS)',
                       colorScheme: colorScheme),
                   const SizedBox(height: 10),
                   _FeatureRow(
                       icon: Icons.bolt,
                       text:
-                          'Intel QSV / NVIDIA NVENC / AMD AMF GPU Acceleration',
+                          'Direct Silicon GPU Accel (Intel QSV, NVENC, AMD AMF)',
                       colorScheme: colorScheme),
                   const SizedBox(height: 10),
                   _FeatureRow(
                       icon: Icons.flash_on,
-                      text: 'Instant Lossless Remuxing (-c copy)',
+                      text: 'Instant Lossless Remuxing (-c copy stream copy)',
                       colorScheme: colorScheme),
                   const SizedBox(height: 10),
                   _FeatureRow(
                       icon: Icons.all_inclusive,
-                      text: 'Unlimited Batch Queue (vs. 3 items on Free)',
+                      text: 'Unlimited Batch Queue with Parallel Workers',
                       colorScheme: colorScheme),
                   const SizedBox(height: 10),
                   _FeatureRow(
                       icon: Icons.video_file,
-                      text: 'Next-Gen Codecs: AV1, HEVC, ProRes 422',
+                      text: 'Next-Gen Codecs: AV1, HEVC, ProRes 422, VP9',
+                      colorScheme: colorScheme),
+                  const SizedBox(height: 10),
+                  _FeatureRow(
+                      icon: Icons.image,
+                      text: 'Multi-Threaded Isolate Pools for Image Studio',
                       colorScheme: colorScheme),
                 ],
               ),
             ),
             const SizedBox(height: 20),
 
-            if (isPro) ...[
-              // Active License Card
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                decoration: BoxDecoration(
-                  color: colorScheme.secondaryContainer,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.verified, color: colorScheme.primary, size: 22),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'PRO Lifetime License Active',
-                            style: TextStyle(
-                                color: colorScheme.onSecondaryContainer,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13),
-                          ),
-                          if (licenseService.customerName != null)
-                            Text(
-                              licenseService.customerName!,
-                              style: TextStyle(
-                                  color: colorScheme.onSecondaryContainer
-                                      .withOpacity(0.8),
-                                  fontSize: 11),
-                            ),
-                        ],
-                      ),
-                    ),
-                    TextButton(
-                      style: TextButton.styleFrom(shape: const StadiumBorder()),
-                      onPressed: () async {
-                        await ref
-                            .read(licenseStateProvider.notifier)
-                            .deactivate();
-                        if (mounted) setState(() {});
-                      },
-                      child: Text('Deactivate',
-                          style: TextStyle(
-                              color: colorScheme.error,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold)),
-                    ),
-                  ],
-                ),
+            // Action Button
+            FilledButton(
+              style: FilledButton.styleFrom(
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
               ),
-            ] else ...[
-              // Primary Lemon Squeezy Buy Button
-              FilledButton.icon(
-                style: FilledButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  foregroundColor: colorScheme.onPrimary,
-                  shape: const StadiumBorder(),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                icon: const Icon(Icons.shopping_bag_outlined, size: 18),
-                label: const Text(
-                  'BUY RETROFLUX PRO ON LEMON SQUEEZY',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                      letterSpacing: 0.5),
-                ),
-                onPressed: LicenseService.openCheckoutPage,
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(
+                'DONE',
+                style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
               ),
-              const SizedBox(height: 16),
-
-              // Divider
-              Row(
-                children: [
-                  Expanded(child: Divider(color: colorScheme.outlineVariant)),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Text(
-                      'OR ACTIVATE WITH LICENSE KEY',
-                      style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.onSurfaceVariant,
-                          letterSpacing: 0.5),
-                    ),
-                  ),
-                  Expanded(child: Divider(color: colorScheme.outlineVariant)),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // License Key Input
-              TextField(
-                controller: _keyController,
-                style: TextStyle(
-                    fontFamily: 'Consolas',
-                    fontSize: 13,
-                    letterSpacing: 0.5,
-                    color: colorScheme.onSurface),
-                decoration: InputDecoration(
-                  labelText: 'ENTER LICENSE KEY',
-                  labelStyle: TextStyle(
-                      color: colorScheme.onSurfaceVariant, fontSize: 11),
-                  hintText: 'Paste Lemon Squeezy or Offline Key',
-                  hintStyle: TextStyle(
-                      color: colorScheme.onSurfaceVariant.withOpacity(0.4),
-                      fontSize: 12),
-                  filled: true,
-                  fillColor: colorScheme.surfaceContainerHigh,
-                  errorText: _error,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide:
-                        BorderSide(color: colorScheme.primary, width: 1.5),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 14),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  FilledButton.tonal(
-                    style: FilledButton.styleFrom(
-                      shape: const StadiumBorder(),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 28, vertical: 14),
-                    ),
-                    onPressed: _isLoading ? null : _activate,
-                    child: _isLoading
-                        ? SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2, color: colorScheme.primary))
-                        : const Text('ACTIVATE LICENSE',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5)),
-                  ),
-                ],
-              ),
-            ],
+            ),
           ],
         ),
       ),

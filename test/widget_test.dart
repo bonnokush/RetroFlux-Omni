@@ -7,39 +7,24 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  group('RetroFlux License Cryptographic Verification Tests', () {
-    test('Dev Key format passes format validation', () {
-      final devKey = LicenseService.generateValidDevKey();
-      expect(devKey.startsWith('RFLX-PRO-'), isTrue);
-      expect(devKey.split('-').length, equals(5));
-    });
-
-    test('LicenseService defaults to Free tier before activation', () {
-      final service = LicenseService();
-      expect(service.isPro, isFalse);
-      expect(service.maxBatchQueueSize, equals(3));
-      expect(service.maxResolutionHeight, equals(1080));
-    });
-
-    test('Lemon Squeezy checkout URL is valid HTTPS', () {
-      expect(LicenseService.checkoutUrl.startsWith('https://'), isTrue);
-      expect(LicenseService.checkoutUrl.contains('lemonsqueezy.com'), isTrue);
-    });
-
-    test('Offline Dev Key activation and deactivation flow', () async {
+  group('RetroFlux Option 1 Microsoft Store Licensing Tests', () {
+    test('LicenseService defaults to PRO tier with full access', () async {
       final service = LicenseService();
       await service.initialize();
-      expect(service.isPro, isFalse);
-
-      final devKey = LicenseService.generateValidDevKey();
-      final result = await service.activateKey(devKey);
-      expect(result.success, isTrue);
       expect(service.isPro, isTrue);
-      expect(service.maxResolutionHeight, equals(2160)); // 4K unlocked
+      expect(service.currentTier, equals(LicenseTier.pro));
+      expect(service.maxBatchQueueSize, equals(1000)); // Unlimited
+      expect(service.maxResolutionHeight, equals(2160)); // 4K UHD
+      expect(service.supportsHardwareAcceleration, isTrue);
+      expect(service.availableVideoCodecs.contains('AV1 (AOMedia)'), isTrue);
+      expect(service.availableVideoCodecs.contains('H.265 (HEVC)'), isTrue);
+    });
 
-      await service.deactivate();
-      expect(service.isPro, isFalse);
-      expect(service.maxResolutionHeight, equals(1080)); // Reverted to Free
+    test('Store Edition customer name and key are active', () async {
+      final service = LicenseService();
+      await service.initialize();
+      expect(service.customerName, equals('Microsoft Store Edition'));
+      expect(service.activeLicenseKey, equals('MICROSOFT-STORE-LIFETIME-PRO'));
     });
   });
 }

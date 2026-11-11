@@ -353,30 +353,31 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
                       fontSize: 12,
                       fontWeight: FontWeight.w600),
                   underline: const SizedBox(),
-                  items: [
-                    const DropdownMenuItem(
+                  items: const [
+                    DropdownMenuItem(
                       value: 'H.264 (Universal)',
                       child: Text('H.264 (Universal)'),
                     ),
                     DropdownMenuItem(
                       value: 'H.265 / HEVC',
-                      child: Text(
-                          isPro ? 'H.265 / HEVC' : 'H.265 / HEVC 🔒 PRO'),
+                      child: Text('H.265 / HEVC'),
                     ),
                     DropdownMenuItem(
                       value: 'AV1 Modern',
-                      child:
-                          Text(isPro ? 'AV1 Modern' : 'AV1 Modern 🔒 PRO'),
+                      child: Text('AV1 Modern'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'ProRes 422',
+                      child: Text('Apple ProRes 422'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'VP9',
+                      child: Text('Google VP9'),
                     ),
                   ],
                   onChanged: (val) {
                     if (val != null) {
-                      if ((val == 'H.265 / HEVC' || val == 'AV1 Modern') &&
-                          !isPro) {
-                        ProModal.show(context);
-                      } else {
-                        setState(() => _selectedCodec = val);
-                      }
+                      setState(() => _selectedCodec = val);
                     }
                   },
                 ),
@@ -400,38 +401,31 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
                       fontSize: 12,
                       fontWeight: FontWeight.w600),
                   underline: const SizedBox(),
-                  items: [
+                  items: const [
                     DropdownMenuItem(
                       value: '4K UHD (2160p)',
-                      child: Text(
-                          isPro ? '4K UHD (2160p)' : '4K UHD (2160p) 🔒 PRO'),
+                      child: Text('4K UHD (2160p)'),
                     ),
                     DropdownMenuItem(
                       value: '1440p QHD',
-                      child:
-                          Text(isPro ? '1440p QHD' : '1440p QHD 🔒 PRO'),
+                      child: Text('1440p QHD'),
                     ),
-                    const DropdownMenuItem(
+                    DropdownMenuItem(
                       value: '1080p FHD',
                       child: Text('1080p FHD'),
                     ),
-                    const DropdownMenuItem(
+                    DropdownMenuItem(
                       value: '720p HD',
                       child: Text('720p HD'),
                     ),
-                    const DropdownMenuItem(
+                    DropdownMenuItem(
                       value: 'Original Source',
                       child: Text('Original Source'),
                     ),
                   ],
                   onChanged: (val) {
                     if (val != null) {
-                      if ((val == '4K UHD (2160p)' || val == '1440p QHD') &&
-                          !isPro) {
-                        ProModal.show(context);
-                      } else {
-                        setState(() => _selectedResolution = val);
-                      }
+                      setState(() => _selectedResolution = val);
                     }
                   },
                 ),

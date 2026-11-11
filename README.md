@@ -11,9 +11,9 @@
 
 <p align="center">
   <a href="https://bonnokush.github.io/RetroFlux-Omni/"><strong>🌐 Live Website</strong></a> · 
-  <a href="https://retroflux.lemonsqueezy.com/checkout/buy/retroflux-omni-pro"><strong>🍋 Buy Pro ($29 Lifetime)</strong></a> · 
+  <a href="https://bonnokush.github.io/RetroFlux-Omni/#pricing"><strong>🛍️ Microsoft Store Edition (₹1,499 / $29)</strong></a> · 
   <a href="#-1-click-powershell-installer-windows"><strong>⚡ 1-Click Install</strong></a> · 
-  <a href="https://github.com/bonnokush/RetroFlux-Omni/releases"><strong>📦 GitHub Releases</strong></a>
+  <a href="https://github.com/bonnokush/RetroFlux-Omni/releases"><strong>📦 GitHub Releases (MSIX)</strong></a>
 </p>
 
 ---
@@ -95,13 +95,22 @@ C:\Projects\RetroFlux-Omni\build\windows\x64\runner\Debug\retroflux_omni.exe
 
 ---
 
-## 🍋 Lemon Squeezy Licensing & Store
+## 🛍️ Microsoft Store & MSIX Distribution
 
-RetroFlux Omni supports online license verification via **Lemon Squeezy** with 100% offline fallback:
-- **Store Checkout**: [Buy RetroFlux Pro on Lemon Squeezy ($29 Lifetime)](https://retroflux.lemonsqueezy.com/checkout/buy/retroflux-omni-pro)
-- **API Activation**: Connects to `https://api.lemonsqueezy.com/v1/licenses/activate`.
-- **Perpetual Offline Caching**: Once verified, HMAC-SHA256 encrypted tokens are saved locally so users can work completely air-gapped with 4K UHD enabled.
-- **Deactivation**: Frees up activation seats via `/licenses/deactivate` to transfer licenses between devices.
+RetroFlux Omni is architected as an **Option 1 (One-Time Lifetime Purchase)** desktop application:
+- **Microsoft Store Pricing**: **₹1,499 INR** (India) / **$29 USD** (Worldwide). No recurring subscriptions.
+- **Immediate Full Access**: All 4K UHD, GPU silicon acceleration (Intel, NVIDIA, AMD), lossless remuxing, and unlimited batch processing features are 100% unlocked from the moment of launch.
+- **Native MSIX Packaging**: Packaged directly as a modern Windows 10 & 11 `.msix` with clean installs, zero registry bloat, and automatic background updates.
+
+### Building the MSIX Package
+
+```powershell
+# Build standard sideload MSIX package
+.\scripts\Build-MSIX.ps1
+
+# Build Store-ready submission package for Microsoft Partner Center
+.\scripts\Build-MSIX.ps1 -Store
+```
 
 ---
 
@@ -116,14 +125,14 @@ RetroFlux-Omni/
 ├── lib/
 │   ├── core/
 │   │   ├── engine_bridge.dart    # High-performance 4K FFmpeg & GPU hardware dispatcher
-│   │   ├── license_service.dart  # Lemon Squeezy API & HMAC offline license engine
+│   │   ├── license_service.dart  # Microsoft Store Option 1 Lifetime Licensing Engine
 │   │   ├── theme_controller.dart # Reactive Material You dynamic theme & Pixel seeds
 │   │   └── worker_isolate.dart   # Background isolate worker pools for zero UI blocking
 │   ├── ui/
 │   │   ├── adaptive_scaffold.dart# Responsive Google Pixel navigation drawer & layout
 │   │   ├── dashboard_screen.dart # Universal Drag-and-Drop Drop Zone & Batch Queue
 │   │   ├── palette_switcher.dart # Live Material You accent palette & theme modal
-│   │   ├── pro_modal.dart        # PRO tier activation dialog & Lemon Squeezy checkout
+│   │   ├── pro_modal.dart        # Store Edition status & verified features dialog
 │   │   ├── theme.dart            # M3 dark/light tonal tokens & color palette
 │   │   └── studios/
 │   │       ├── media_studio.dart # 4K Video Transcoder & Lossless Remux Studio
@@ -131,6 +140,8 @@ RetroFlux-Omni/
 │   │       └── history_view.dart # Export history & file reveal manager
 │   └── main.dart                 # Application entry point with DynamicColorBuilder
 ├── scripts/
+│   ├── Build-MSIX.ps1            # Automated Windows MSIX package builder
+│   ├── build_icons.py            # Multi-platform icon generator
 │   └── Install-RetroFlux.ps1     # Native Windows PowerShell installer script
 ├── test/
 │   ├── e2e_ui_audit_test.dart        # End-to-end automated UI & queue audit

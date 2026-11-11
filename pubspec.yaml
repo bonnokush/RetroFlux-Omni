@@ -66,7 +66,11 @@ msix_config:
   display_name: RetroFlux Omni
   publisher_display_name: RetroFlux
   identity_name: RetroFlux.Omni
+  publisher: CN=RetroFlux
   msix_version: 1.0.0.0
   logo_path: assets/icon.png
   file_extension: .mp4, .mkv, .mov, .avi, .webm, .mp3, .wav, .flac, .png, .jpg, .webp
   protocol_activation: retroflux
+  execution_alias: retroflux
+  languages: en-us
+  os_min_version: 10.0.17763.0
