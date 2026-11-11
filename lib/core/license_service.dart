@@ -37,9 +37,9 @@ class LicenseService {
   static const String _signingSalt =
       'RETROFLUX_OMNI_4_ENTERPRISE_HMAC_SALT_2026';
 
-  // Lemon Squeezy Store Checkout URL
+  // Lemon Squeezy Store URL for RetroFlux Omni
   static const String checkoutUrl =
-      'https://retroflux.lemonsqueezy.com/checkout/buy/retroflux-pro';
+      'https://retroflux.lemonsqueezy.com/checkout/buy/retroflux-omni-pro';
 
   LicenseTier _currentTier = LicenseTier.free;
   String? _activeLicenseKey;

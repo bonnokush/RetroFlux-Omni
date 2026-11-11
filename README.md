@@ -1,9 +1,42 @@
 # RetroFlux Omni
 
-> **Dedicated High-Performance 4K Media Conversion & Transcoding Studio**  
-> *Version: 1.0.0+1 • Production Release*
+<p align="center">
+  <img src="website/lemonsqueezy-cover.png" alt="RetroFlux Omni PRO Banner" width="100%" style="border-radius: 16px;" />
+</p>
 
-RetroFlux Omni is a privacy-first, hardware-accelerated media conversion engine built natively with Flutter, C++ runner, Dart Isolates, and native FFmpeg pipelines. Engineered specifically for speed, it excels at **4K UHD video transcoding**, **1-second lossless remuxing**, **high-fidelity audio extraction**, and **multithreaded image processing**. It features a Google Pixel-inspired **Material 3 (Material You)** dynamic tonal interface and offline cryptographic license gating.
+<p align="center">
+  <strong>Dedicated High-Performance 4K Media Conversion & Transcoding Studio</strong><br />
+  <em>Hardware-Accelerated Intel QSV, NVIDIA NVENC & AMD AMF Silicon • 1-Second Lossless Remux</em>
+</p>
+
+<p align="center">
+  <a href="https://bonnokush.github.io/RetroFlux-Omni/"><strong>🌐 Live Website</strong></a> · 
+  <a href="https://retroflux.lemonsqueezy.com/checkout/buy/retroflux-omni-pro"><strong>🍋 Buy Pro ($29 Lifetime)</strong></a> · 
+  <a href="#-1-click-powershell-installer-windows"><strong>⚡ 1-Click Install</strong></a> · 
+  <a href="https://github.com/bonnokush/RetroFlux-Omni/releases"><strong>📦 GitHub Releases</strong></a>
+</p>
+
+---
+
+## ⚡ 1-Click PowerShell Installer (Windows)
+
+Run the following command in PowerShell (Run as Administrator or standard user) to automatically download, unblock (bypassing Smart App Control MOTW flags), configure FFmpeg, and install RetroFlux Omni with Desktop and Start Menu shortcuts:
+
+```powershell
+irm https://raw.githubusercontent.com/bonnokush/RetroFlux-Omni/main/install.ps1 | iex
+```
+
+---
+
+## 📸 Screenshots & Interface
+
+<p align="center">
+  <img src="website/screenshots/01-retroflux-4k-media-studio.png" alt="RetroFlux Omni 4K Media Studio" width="100%" style="border-radius: 12px; margin-bottom: 12px;" />
+</p>
+
+<p align="center">
+  <img src="website/screenshots/02-instant-lossless-remux.png" alt="Instant Lossless Remux Engine" width="100%" style="border-radius: 12px;" />
+</p>
 
 ---
 
@@ -46,18 +79,23 @@ RetroFlux Omni is a privacy-first, hardware-accelerated media conversion engine 
 
 ## 📁 Where is the Executable?
 
-Once built, the standalone executable and its runtime dependencies are located in:
+Once built, the standalone executable and its companion dependencies are located in:
 
-### Release Build (Optimized for Distribution)
-```
-C:\Projects\RetroFlux-Omni\build\windows\x64\runner\Release\retroflux_omni.exe
-```
-> **Note**: To run or distribute the portable app, copy the entire `Release\` folder (including `retroflux_omni.exe`, `flutter_windows.dll`, companion plugin `.dll` files, and the `data/` directory).
-
-### Debug Build (Development)
+### Standalone Executable Directory
 ```
 C:\Projects\RetroFlux-Omni\build\windows\x64\runner\Debug\retroflux_omni.exe
 ```
+> **Distribution Note**: Like all native Windows Flutter applications, `retroflux_omni.exe` runs alongside `flutter_windows.dll`, plugin DLLs, and the `data/` asset folder. Use the 1-click installer (`install.ps1`) to automatically deploy all dependencies into `%LOCALAPPDATA%\Programs\RetroFlux-Omni` and create shortcuts.
+
+---
+
+## 🍋 Lemon Squeezy Licensing & Store
+
+RetroFlux Omni supports online license verification via **Lemon Squeezy** with 100% offline fallback:
+- **Store Checkout**: [Buy RetroFlux Pro on Lemon Squeezy ($29 Lifetime)](https://retroflux.lemonsqueezy.com/checkout/buy/retroflux-omni-pro)
+- **API Activation**: Connects to `https://api.lemonsqueezy.com/v1/licenses/activate`.
+- **Perpetual Offline Caching**: Once verified, HMAC-SHA256 encrypted tokens are saved locally so users can work completely air-gapped with 4K UHD enabled.
+- **Deactivation**: Frees up activation seats via `/licenses/deactivate` to transfer licenses between devices.
 
 ---
 
@@ -67,28 +105,37 @@ C:\Projects\RetroFlux-Omni\build\windows\x64\runner\Debug\retroflux_omni.exe
 RetroFlux-Omni/
 ├── assets/
 │   └── fonts/                 # Embedded Google Product Sans TTF font family
+├── docs/                      # GitHub Pages static entrypoint & documentation
+├── install.ps1                # 1-Click Automated Windows PowerShell installer
 ├── lib/
 │   ├── core/
 │   │   ├── engine_bridge.dart    # High-performance 4K FFmpeg & GPU hardware dispatcher
-│   │   ├── license_service.dart  # Offline HMAC-SHA256 signature validation & storage
+│   │   ├── license_service.dart  # Lemon Squeezy API & HMAC offline license engine
 │   │   ├── theme_controller.dart # Reactive Material You dynamic theme & Pixel seeds
-│   │   └── worker_isolate.dart   # Background isolate worker pools for zero UI thread blocking
+│   │   └── worker_isolate.dart   # Background isolate worker pools for zero UI blocking
 │   ├── ui/
 │   │   ├── adaptive_scaffold.dart# Responsive Google Pixel navigation drawer & layout
 │   │   ├── dashboard_screen.dart # Universal Drag-and-Drop Drop Zone & Batch Queue
 │   │   ├── palette_switcher.dart # Live Material You accent palette & theme modal
-│   │   ├── pro_modal.dart        # PRO tier activation dialog & offline license manager
+│   │   ├── pro_modal.dart        # PRO tier activation dialog & Lemon Squeezy checkout
 │   │   ├── theme.dart            # M3 dark/light tonal tokens & color palette
 │   │   └── studios/
 │   │       ├── media_studio.dart # 4K Video Transcoder & Lossless Remux Studio
 │   │       ├── image_studio.dart # Image Studio & Multi-format Compressor
 │   │       └── history_view.dart # Export history & file reveal manager
 │   └── main.dart                 # Application entry point with DynamicColorBuilder
+├── scripts/
+│   └── Install-RetroFlux.ps1     # Native Windows PowerShell installer script
 ├── test/
 │   ├── e2e_ui_audit_test.dart        # End-to-end automated UI & queue audit
 │   ├── material_you_theme_test.dart  # Theme controller & palette switching tests
 │   ├── media_and_studios_test.dart   # 4K Media Studio & hardware capability tests
 │   └── widget_test.dart              # Cryptographic license verification tests
+├── website/                   # High-converting product landing page & screenshots
+│   ├── screenshots/           # High-resolution UI screenshots
+│   ├── index.html             # Tailwind CSS + Material 3 product landing page
+│   ├── lemonsqueezy-cover.png # 1280x720 Lemon Squeezy product cover banner
+│   └── retroflux-icon.png     # 1024x1024 high-res app icon
 └── pubspec.yaml
 ```
 
@@ -103,25 +150,14 @@ RetroFlux-Omni/
 
 ### Dependency Setup
 ```powershell
-# Navigate to repository root
 cd C:\Projects\RetroFlux-Omni
-
-# Fetch dependencies
 flutter pub get
 ```
 
 ### Running the App
 ```powershell
-# Run in debug mode on Windows Desktop
 flutter run -d windows
 ```
-
-### Building the Executable
-```powershell
-# Build standalone release executable
-flutter build windows --release
-```
-The output `.exe` will be generated in `build\windows\x64\runner\Release\`.
 
 ---
 
