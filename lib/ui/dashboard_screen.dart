@@ -412,15 +412,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               children: [
                 Row(
                   children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: colorScheme.primaryContainer,
-                        shape: BoxShape.circle,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.asset(
+                        'assets/icon.png',
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.cover,
                       ),
-                      child: Icon(Icons.flash_on,
-                          color: colorScheme.primary, size: 20),
                     ),
                     const SizedBox(width: 12),
                     Expanded(child: content),
@@ -441,15 +440,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ),
           child: Row(
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer,
-                  shape: BoxShape.circle,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  'assets/icon.png',
+                  width: 48,
+                  height: 48,
+                  fit: BoxFit.cover,
                 ),
-                child:
-                    Icon(Icons.flash_on, color: colorScheme.primary, size: 24),
               ),
               const SizedBox(width: 16),
               Expanded(child: content),

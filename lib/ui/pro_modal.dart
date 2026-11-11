@@ -100,10 +100,6 @@ class _ProModalState extends ConsumerState<ProModal> {
     }
   }
 
-  void _fillDevKey() {
-    _keyController.text = LicenseService.generateValidDevKey();
-  }
-
   @override
   Widget build(BuildContext context) {
     final isPro = ref.watch(licenseStateProvider) == LicenseTier.pro;
@@ -126,15 +122,14 @@ class _ProModalState extends ConsumerState<ProModal> {
             // Header with PRO badge
             Row(
               children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
-                    shape: BoxShape.circle,
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    'assets/icon.png',
+                    width: 44,
+                    height: 44,
+                    fit: BoxFit.cover,
                   ),
-                  child: Icon(Icons.workspace_premium,
-                      color: colorScheme.primary, size: 24),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -330,24 +325,13 @@ class _ProModalState extends ConsumerState<ProModal> {
               const SizedBox(height: 14),
 
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton.icon(
-                    style: TextButton.styleFrom(shape: const StadiumBorder()),
-                    icon: Icon(Icons.auto_fix_high,
-                        size: 14, color: colorScheme.primary),
-                    label: Text('Fill Dev Key',
-                        style: TextStyle(
-                            color: colorScheme.primary,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold)),
-                    onPressed: _fillDevKey,
-                  ),
                   FilledButton.tonal(
                     style: FilledButton.styleFrom(
                       shape: const StadiumBorder(),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 12),
+                          horizontal: 28, vertical: 14),
                     ),
                     onPressed: _isLoading ? null : _activate,
                     child: _isLoading
@@ -356,7 +340,7 @@ class _ProModalState extends ConsumerState<ProModal> {
                             height: 16,
                             child: CircularProgressIndicator(
                                 strokeWidth: 2, color: colorScheme.primary))
-                        : const Text('ACTIVATE',
+                        : const Text('ACTIVATE LICENSE',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 0.5)),

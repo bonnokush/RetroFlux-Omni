@@ -5,7 +5,7 @@
     Installs RetroFlux Omni 4K Media Conversion Engine on Windows 10 & 11.
     - Automatically checks and installs FFmpeg via WinGet if needed.
     - Automatically strips Mark of the Web (MOTW) via Unblock-File to bypass SAC/SmartScreen blocks.
-    - Creates Start Menu and Desktop shortcuts.
+    - Creates Start Menu and Desktop shortcuts with brand icon.
 .EXAMPLE
     irm https://raw.githubusercontent.com/bonnokush/RetroFlux-Omni/main/install.ps1 | iex
 #>
@@ -21,7 +21,7 @@ $ErrorActionPreference = 'Stop'
 function Write-Header {
     Write-Host ""
     Write-Host " ============================================================ " -ForegroundColor Cyan
-    Write-Host "   ⚡ RetroFlux Omni — 4K Media Conversion Engine            " -ForegroundColor Green
+    Write-Host "   RetroFlux Omni - 4K Media Conversion Engine               " -ForegroundColor Green
     Write-Host "   Hardware-Accelerated Transcoding, Remuxing & Audio Studio  " -ForegroundColor DarkGray
     Write-Host " ============================================================ " -ForegroundColor Cyan
     Write-Host ""
@@ -41,7 +41,7 @@ function Test-Prerequisites {
         return $false
     }
 
-    Write-Host "       ✓ 64-bit Windows detected ($($osVersion.Major).$($osVersion.Minor) Build $($osVersion.Build))" -ForegroundColor Green
+    Write-Host "       [OK] 64-bit Windows detected ($($osVersion.Major).$($osVersion.Minor) Build $($osVersion.Build))" -ForegroundColor Green
     return $true
 }
 
@@ -59,14 +59,14 @@ function Ensure-FFmpeg {
     }
 
     if ($ffmpegFound) {
-        Write-Host "       ✓ FFmpeg hardware acceleration pipeline detected." -ForegroundColor Green
+        Write-Host "       [OK] FFmpeg hardware acceleration pipeline detected." -ForegroundColor Green
     } else {
         Write-Host "       FFmpeg not detected on PATH. Installing Gyan.FFmpeg via WinGet..." -ForegroundColor Cyan
         try {
             winget install Gyan.FFmpeg --accept-source-agreements --accept-package-agreements --silent
-            Write-Host "       ✓ FFmpeg successfully installed via WinGet." -ForegroundColor Green
+            Write-Host "       [OK] FFmpeg successfully installed via WinGet." -ForegroundColor Green
         } catch {
-            Write-Host "       Note: WinGet installation skipped. You can manually install FFmpeg if needed." -ForegroundColor DarkGray
+            Write-Host "       [INFO] WinGet installation skipped. You can manually install FFmpeg if needed." -ForegroundColor DarkGray
         }
     }
 }
@@ -91,9 +91,11 @@ function Install-RetroFlux {
     # Check if installing from local workspace repository
     $localBuildDir = "C:\Projects\RetroFlux-Omni\build\windows\x64\runner\Debug"
     if (Test-Path $localBuildDir) {
-        Write-Host "       Copying local application binaries..." -ForegroundColor DarkGray
+        Write-Host "       Copying application binaries..." -ForegroundColor DarkGray
+        Get-Process -Name "retroflux_omni" -ErrorAction SilentlyContinue | Stop-Process -Force
+        Start-Sleep -Milliseconds 200
         Copy-Item -Path "$localBuildDir\*" -Destination $installDir -Recurse -Force
-        Write-Host "       ✓ Local binaries deployed." -ForegroundColor Green
+        Write-Host "       [OK] Binaries deployed." -ForegroundColor Green
     } else {
         # Download latest release binary from GitHub Releases
         $repoOwner = "bonnokush"
@@ -107,7 +109,7 @@ function Install-RetroFlux {
             $webClient = New-Object System.Net.WebClient
             $webClient.Headers.Add("User-Agent", "RetroFlux-Omni-Installer")
             $webClient.DownloadFile($downloadUrl, $setupPath)
-            Write-Host "       ✓ Download complete." -ForegroundColor Green
+            Write-Host "       [OK] Download complete." -ForegroundColor Green
 
             # Execute silent install
             Start-Process -FilePath $setupPath -ArgumentList "/SILENT" -Wait
@@ -122,9 +124,9 @@ function Install-RetroFlux {
     Write-Host " [4/5] Unblocking application files (bypassing Smart App Control / SmartScreen)..." -ForegroundColor Yellow
     try {
         Get-ChildItem -Path $installDir -Recurse -ErrorAction SilentlyContinue | Unblock-File -ErrorAction SilentlyContinue
-        Write-Host "       ✓ Removed Mark-of-the-Web zone identifiers from all binaries and DLLs." -ForegroundColor Green
+        Write-Host "       [OK] Removed Mark-of-the-Web zone identifiers from all binaries and DLLs." -ForegroundColor Green
     } catch {
-        Write-Host "       Note: Unblock-File completed with warnings." -ForegroundColor DarkGray
+        Write-Host "       [INFO] Unblock-File completed." -ForegroundColor DarkGray
     }
 
     # Create Shortcuts
@@ -142,6 +144,7 @@ function Install-RetroFlux {
         $startMenuShortcut = $wscript.CreateShortcut((Join-Path $startMenuDir "RetroFlux Omni.lnk"))
         $startMenuShortcut.TargetPath = $exePath
         $startMenuShortcut.WorkingDirectory = $installDir
+        $startMenuShortcut.IconLocation = "$exePath,0"
         $startMenuShortcut.Description = "RetroFlux Omni 4K Media Conversion Engine"
         $startMenuShortcut.Save()
 
@@ -149,15 +152,16 @@ function Install-RetroFlux {
         $desktopShortcut = $wscript.CreateShortcut((Join-Path ([Environment]::GetFolderPath("Desktop")) "RetroFlux Omni.lnk"))
         $desktopShortcut.TargetPath = $exePath
         $desktopShortcut.WorkingDirectory = $installDir
+        $desktopShortcut.IconLocation = "$exePath,0"
         $desktopShortcut.Description = "RetroFlux Omni 4K Media Conversion Engine"
         $desktopShortcut.Save()
 
-        Write-Host "       ✓ Created Start Menu & Desktop shortcuts." -ForegroundColor Green
+        Write-Host "       [OK] Created Start Menu & Desktop shortcuts." -ForegroundColor Green
     }
 
     Write-Host ""
     Write-Host " ============================================================ " -ForegroundColor Green
-    Write-Host "   🎉 RetroFlux Omni installation complete!                   " -ForegroundColor Green
+    Write-Host "   RetroFlux Omni installation complete!                      " -ForegroundColor Green
     Write-Host "   Launch from Desktop or Start Menu: 'RetroFlux Omni'        " -ForegroundColor Cyan
     Write-Host " ============================================================ " -ForegroundColor Green
     Write-Host ""

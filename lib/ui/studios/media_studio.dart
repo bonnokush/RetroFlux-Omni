@@ -21,7 +21,7 @@ class MediaStudio extends ConsumerStatefulWidget {
 class _MediaStudioState extends ConsumerState<MediaStudio> {
   bool _isDragging = false;
   String _selectedCodec = 'H.264 (Universal)';
-  String _selectedResolution = '4K UHD (2160p)';
+  String _selectedResolution = '1080p FHD';
   bool _hwAccel = true;
   bool _losslessRemux = false;
   String _detectedGpuLabel = 'Detecting GPU...';
@@ -30,6 +30,13 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
   void initState() {
     super.initState();
     _probeGpu();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && ref.read(licenseStateProvider) == LicenseTier.pro) {
+        setState(() {
+          _selectedResolution = '4K UHD (2160p)';
+        });
+      }
+    });
   }
 
   Future<void> _probeGpu() async {
@@ -347,15 +354,25 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
                       fontWeight: FontWeight.w600),
                   underline: const SizedBox(),
                   items: [
-                    'H.264 (Universal)',
-                    'H.265 / HEVC ${isPro ? "" : "🔒 PRO"}',
-                    'AV1 Modern ${isPro ? "" : "🔒 PRO"}',
-                  ]
-                      .map((c) => DropdownMenuItem(value: c, child: Text(c)))
-                      .toList(),
+                    const DropdownMenuItem(
+                      value: 'H.264 (Universal)',
+                      child: Text('H.264 (Universal)'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'H.265 / HEVC',
+                      child: Text(
+                          isPro ? 'H.265 / HEVC' : 'H.265 / HEVC 🔒 PRO'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'AV1 Modern',
+                      child:
+                          Text(isPro ? 'AV1 Modern' : 'AV1 Modern 🔒 PRO'),
+                    ),
+                  ],
                   onChanged: (val) {
                     if (val != null) {
-                      if (val.contains('PRO') && !isPro) {
+                      if ((val == 'H.265 / HEVC' || val == 'AV1 Modern') &&
+                          !isPro) {
                         ProModal.show(context);
                       } else {
                         setState(() => _selectedCodec = val);
@@ -384,17 +401,33 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
                       fontWeight: FontWeight.w600),
                   underline: const SizedBox(),
                   items: [
-                    '4K UHD (2160p) ${isPro ? "" : "🔒 PRO"}',
-                    '1440p QHD ${isPro ? "" : "🔒 PRO"}',
-                    '1080p FHD',
-                    '720p HD',
-                    'Original Source',
-                  ]
-                      .map((r) => DropdownMenuItem(value: r, child: Text(r)))
-                      .toList(),
+                    DropdownMenuItem(
+                      value: '4K UHD (2160p)',
+                      child: Text(
+                          isPro ? '4K UHD (2160p)' : '4K UHD (2160p) 🔒 PRO'),
+                    ),
+                    DropdownMenuItem(
+                      value: '1440p QHD',
+                      child:
+                          Text(isPro ? '1440p QHD' : '1440p QHD 🔒 PRO'),
+                    ),
+                    const DropdownMenuItem(
+                      value: '1080p FHD',
+                      child: Text('1080p FHD'),
+                    ),
+                    const DropdownMenuItem(
+                      value: '720p HD',
+                      child: Text('720p HD'),
+                    ),
+                    const DropdownMenuItem(
+                      value: 'Original Source',
+                      child: Text('Original Source'),
+                    ),
+                  ],
                   onChanged: (val) {
                     if (val != null) {
-                      if (val.contains('PRO') && !isPro) {
+                      if ((val == '4K UHD (2160p)' || val == '1440p QHD') &&
+                          !isPro) {
                         ProModal.show(context);
                       } else {
                         setState(() => _selectedResolution = val);

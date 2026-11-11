@@ -120,8 +120,8 @@ class LicenseService {
           success: false, errorMessage: 'Please enter a license key.');
     }
 
-    // A. Check for Offline Dev / Enterprise Key format
-    if (cleanKey.toUpperCase().startsWith('RFLX-PRO-')) {
+    // A. Check for Offline Dev / Enterprise Key format (Strictly restricted to internal debug builds)
+    if (kDebugMode && cleanKey.toUpperCase().startsWith('RFLX-PRO-')) {
       final upperKey = cleanKey.toUpperCase();
       if (_validateDevKeyFormat(upperKey)) {
         await _saveActiveLicense(upperKey,

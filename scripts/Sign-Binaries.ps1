@@ -19,7 +19,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 Write-Host "============================================================" -ForegroundColor Cyan
-Write-Host "  🔏 RetroFlux Omni — Authenticode Code Signing Tool         " -ForegroundColor Green
+Write-Host "   RetroFlux Omni - Authenticode Code Signing Tool          " -ForegroundColor Green
 Write-Host "============================================================" -ForegroundColor Cyan
 
 # 1. Locate SignTool.exe
@@ -73,4 +73,4 @@ foreach ($file in $filesToSign) {
 }
 
 Write-Host ""
-Write-Host "✓ All binaries successfully signed with Authenticode signatures." -ForegroundColor Green
+Write-Host "[SUCCESS] All binaries successfully signed with Authenticode signatures." -ForegroundColor Green

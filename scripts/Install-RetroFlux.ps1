@@ -7,7 +7,7 @@
     - Probes FFmpeg and installs Gyan.FFmpeg via WinGet if absent.
     - Copies/deploys the native Windows runner.
     - Unblocks all binaries to prevent SAC (Smart App Control) Mark-of-the-Web blocks.
-    - Creates Start Menu & Desktop shortcuts.
+    - Creates Start Menu & Desktop shortcuts with brand icon.
 .EXAMPLE
     .\Install-RetroFlux.ps1
 #>
@@ -21,7 +21,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 Write-Host "============================================================" -ForegroundColor Cyan
-Write-Host "  ⚡ Installing RetroFlux Omni — 4K Media Conversion Engine   " -ForegroundColor Green
+Write-Host "  RetroFlux Omni - 4K Media Conversion Engine Installer     " -ForegroundColor Green
 Write-Host "============================================================" -ForegroundColor Cyan
 
 # 1. 64-bit & OS Version check
@@ -36,9 +36,9 @@ if (-not (Test-Path $winGetFfmpeg) -and -not (Get-Command ffmpeg -ErrorAction Si
     Write-Host "-> Installing Gyan.FFmpeg for hardware 4K acceleration..." -ForegroundColor Yellow
     try {
         winget install Gyan.FFmpeg --accept-source-agreements --accept-package-agreements --silent
-        Write-Host "   ✓ FFmpeg installed successfully." -ForegroundColor Green
+        Write-Host "   [OK] FFmpeg installed successfully." -ForegroundColor Green
     } catch {
-        Write-Host "   Note: WinGet installation skipped. Ensure FFmpeg is available on PATH." -ForegroundColor DarkGray
+        Write-Host "   [INFO] WinGet installation skipped. Ensure FFmpeg is available on PATH." -ForegroundColor DarkGray
     }
 } else {
     Write-Host "-> FFmpeg hardware acceleration pipeline detected." -ForegroundColor Green
@@ -53,13 +53,15 @@ if (-not (Test-Path $installDir)) {
 $localBuildDir = "C:\Projects\RetroFlux-Omni\build\windows\x64\runner\Debug"
 if (Test-Path $localBuildDir) {
     Write-Host "-> Deploying RetroFlux Omni to $installDir..." -ForegroundColor Yellow
+    Get-Process -Name "retroflux_omni" -ErrorAction SilentlyContinue | Stop-Process -Force
+    Start-Sleep -Milliseconds 200
     Copy-Item -Path "$localBuildDir\*" -Destination $installDir -Recurse -Force
 }
 
 # 4. SAC Unblock-File
 Write-Host "-> Unblocking binaries (removing Mark-of-the-Web to prevent SAC/SmartScreen blocks)..." -ForegroundColor Yellow
 Get-ChildItem -Path $installDir -Recurse -ErrorAction SilentlyContinue | Unblock-File -ErrorAction SilentlyContinue
-Write-Host "   ✓ All application binaries unblocked." -ForegroundColor Green
+Write-Host "   [OK] All application binaries unblocked." -ForegroundColor Green
 
 # 5. Shortcuts
 $exePath = Join-Path $installDir "retroflux_omni.exe"
@@ -72,15 +74,17 @@ if (Test-Path $exePath) {
     $shortcut1 = $wscript.CreateShortcut((Join-Path $startMenuDir "RetroFlux Omni.lnk"))
     $shortcut1.TargetPath = $exePath
     $shortcut1.WorkingDirectory = $installDir
+    $shortcut1.IconLocation = "$exePath,0"
     $shortcut1.Save()
 
     # Desktop
     $shortcut2 = $wscript.CreateShortcut((Join-Path ([Environment]::GetFolderPath("Desktop")) "RetroFlux Omni.lnk"))
     $shortcut2.TargetPath = $exePath
     $shortcut2.WorkingDirectory = $installDir
+    $shortcut2.IconLocation = "$exePath,0"
     $shortcut2.Save()
 
     Write-Host "-> Shortcuts created on Desktop and Start Menu." -ForegroundColor Green
 }
 
-Write-Host "✓ Installation finished successfully!" -ForegroundColor Green
+Write-Host "[SUCCESS] Installation finished successfully!" -ForegroundColor Green
