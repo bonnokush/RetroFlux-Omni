@@ -44,6 +44,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  msix: ^3.18.0
 
 flutter:
   uses-material-design: true
@@ -59,4 +60,13 @@ flutter:
           weight: 700
         - asset: assets/fonts/ProductSans-BoldItalic.ttf
           weight: 700
-          style: italic
+        - asset: assets/fonts/ProductSans-Regular.ttf
+
+msix_config:
+  display_name: RetroFlux Omni
+  publisher_display_name: RetroFlux
+  identity_name: RetroFlux.Omni
+  msix_version: 1.0.0.0
+  logo_path: assets/icon.png
+  file_extension: .mp4, .mkv, .mov, .avi, .webm, .mp3, .wav, .flac, .png, .jpg, .webp
+  protocol_activation: retroflux
