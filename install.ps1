@@ -120,29 +120,13 @@ function Install-RetroFlux {
         }
     }
 
-    # SAC / SmartScreen unblock: strip Mark of the Web and clean invalid self-signed certs
+    # SAC / SmartScreen unblock: strip Mark of the Web
     Write-Host " [4/5] Unblocking application files (configuring for Windows SmartScreen & SAC)..." -ForegroundColor Yellow
     try {
         Get-ChildItem -Path $installDir -Recurse -ErrorAction SilentlyContinue | Unblock-File -ErrorAction SilentlyContinue
         Write-Host "       [OK] Removed Mark-of-the-Web zone identifiers from all binaries and DLLs." -ForegroundColor Green
     } catch {
         Write-Host "       [INFO] Unblock-File completed." -ForegroundColor DarkGray
-    }
-
-    # If any binaries carry an untrusted self-signed signature, clean them to prevent Windows SAC UnknownError policy blocks
-    $signtoolPaths = @(
-        "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe",
-        "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe",
-        "C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe"
-    )
-    $signtool = $signtoolPaths | Where-Object { Test-Path $_ } | Select-Object -First 1
-    if ($signtool) {
-        Get-ChildItem -Path $installDir -Include "*.exe", "*.dll" -Recurse | ForEach-Object {
-            $sig = Get-AuthenticodeSignature $_.FullName -ErrorAction SilentlyContinue
-            if ($sig -and $sig.Status -eq 'UnknownError') {
-                & $signtool remove /s $_.FullName 2>$null | Out-Null
-            }
-        }
     }
 
     # Create Shortcuts
