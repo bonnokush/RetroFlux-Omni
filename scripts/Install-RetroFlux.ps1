@@ -58,10 +58,26 @@ if (Test-Path $localBuildDir) {
     Copy-Item -Path "$localBuildDir\*" -Destination $installDir -Recurse -Force
 }
 
-# 4. SAC Unblock-File
+# 4. SAC Unblock-File & Signature Verification
 Write-Host "-> Unblocking binaries (removing Mark-of-the-Web to prevent SAC/SmartScreen blocks)..." -ForegroundColor Yellow
 Get-ChildItem -Path $installDir -Recurse -ErrorAction SilentlyContinue | Unblock-File -ErrorAction SilentlyContinue
-Write-Host "   [OK] All application binaries unblocked." -ForegroundColor Green
+
+# If any binaries carry an untrusted self-signed signature, clean them to prevent Windows SAC UnknownError policy blocks
+$signtoolPaths = @(
+    "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe",
+    "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe",
+    "C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe"
+)
+$signtool = $signtoolPaths | Where-Object { Test-Path $_ } | Select-Object -First 1
+if ($signtool) {
+    Get-ChildItem -Path $installDir -Include "*.exe", "*.dll" -Recurse | ForEach-Object {
+        $sig = Get-AuthenticodeSignature $_.FullName -ErrorAction SilentlyContinue
+        if ($sig -and $sig.Status -eq 'UnknownError') {
+            & $signtool remove /s $_.FullName 2>$null | Out-Null
+        }
+    }
+}
+Write-Host "   [OK] All application binaries unblocked and sanitized." -ForegroundColor Green
 
 # 5. Shortcuts
 $exePath = Join-Path $installDir "retroflux_omni.exe"

@@ -13,7 +13,8 @@
 param(
     [string]$TargetDir = "C:\Projects\RetroFlux-Omni\build\windows\x64\runner\Debug",
     [string]$CertSubject = "RetroFlux Official",
-    [string]$TimestampServer = "http://timestamp.digicert.com"
+    [string]$TimestampServer = "http://timestamp.digicert.com",
+    [switch]$Remove
 )
 
 $ErrorActionPreference = 'Stop'
@@ -39,6 +40,19 @@ if (-not $signtool) {
 Write-Host "-> Found SignTool: $signtool" -ForegroundColor DarkGray
 Write-Host "-> Target Directory: $TargetDir" -ForegroundColor DarkGray
 
+# 2. Check if removing signatures
+if ($Remove) {
+    Write-Host "-> Removing digital signatures from all binaries in $TargetDir..." -ForegroundColor Yellow
+    $filesToClean = Get-ChildItem -Path $TargetDir -Include "*.exe", "*.dll" -Recurse
+    foreach ($file in $filesToClean) {
+        Write-Host "   Removing signature: $($file.Name)..." -NoNewline -ForegroundColor DarkGray
+        & $signtool remove /s $file.FullName 2>$null | Out-Null
+        Write-Host " [REMOVED]" -ForegroundColor Green
+    }
+    Write-Host "[SUCCESS] All signatures removed." -ForegroundColor Green
+    exit 0
+}
+
 # 2. Check Certificate
 $cert = Get-ChildItem -Path "Cert:\CurrentUser\My", "Cert:\LocalMachine\My" -Recurse | 
     Where-Object { $_.Subject -like "*$CertSubject*" -and $_.EnhancedKeyUsageList.FriendlyName -contains "Code Signing" } | 
@@ -46,6 +60,8 @@ $cert = Get-ChildItem -Path "Cert:\CurrentUser\My", "Cert:\LocalMachine\My" -Rec
 
 if (-not $cert) {
     Write-Warning "No existing Code Signing certificate found matching '$CertSubject'."
+    Write-Host "NOTE: Self-signed certificates will trigger Windows 11 Smart App Control (SAC) blocks." -ForegroundColor DarkYellow
+    Write-Host "To satisfy SAC, a commercial certificate (DigiCert, Sectigo, etc.) or Microsoft Store package is required." -ForegroundColor DarkYellow
     Write-Host "Creating a local development code-signing certificate..." -ForegroundColor Yellow
     $cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject "CN=$CertSubject, O=RetroFlux, C=US" -CertStoreLocation "Cert:\CurrentUser\My" -NotAfter (Get-Date).AddYears(5)
     Write-Host "Created certificate: $($cert.Thumbprint)" -ForegroundColor Green

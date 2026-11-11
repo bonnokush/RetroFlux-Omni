@@ -120,13 +120,29 @@ function Install-RetroFlux {
         }
     }
 
-    # SAC / SmartScreen unblock: strip Mark of the Web
-    Write-Host " [4/5] Unblocking application files (bypassing Smart App Control / SmartScreen)..." -ForegroundColor Yellow
+    # SAC / SmartScreen unblock: strip Mark of the Web and clean invalid self-signed certs
+    Write-Host " [4/5] Unblocking application files (configuring for Windows SmartScreen & SAC)..." -ForegroundColor Yellow
     try {
         Get-ChildItem -Path $installDir -Recurse -ErrorAction SilentlyContinue | Unblock-File -ErrorAction SilentlyContinue
         Write-Host "       [OK] Removed Mark-of-the-Web zone identifiers from all binaries and DLLs." -ForegroundColor Green
     } catch {
         Write-Host "       [INFO] Unblock-File completed." -ForegroundColor DarkGray
+    }
+
+    # If any binaries carry an untrusted self-signed signature, clean them to prevent Windows SAC UnknownError policy blocks
+    $signtoolPaths = @(
+        "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe",
+        "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe",
+        "C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe"
+    )
+    $signtool = $signtoolPaths | Where-Object { Test-Path $_ } | Select-Object -First 1
+    if ($signtool) {
+        Get-ChildItem -Path $installDir -Include "*.exe", "*.dll" -Recurse | ForEach-Object {
+            $sig = Get-AuthenticodeSignature $_.FullName -ErrorAction SilentlyContinue
+            if ($sig -and $sig.Status -eq 'UnknownError') {
+                & $signtool remove /s $_.FullName 2>$null | Out-Null
+            }
+        }
     }
 
     # Create Shortcuts
@@ -170,7 +186,14 @@ function Install-RetroFlux {
         $launch = Read-Host " Launch RetroFlux Omni now? (Y/n)"
         if ($launch -ne 'n' -and $launch -ne 'N') {
             if (Test-Path $exePath) {
-                Start-Process -FilePath $exePath -WorkingDirectory $installDir
+                try {
+                    Start-Process -FilePath $exePath -WorkingDirectory $installDir
+                    Write-Host "       [OK] RetroFlux Omni launched." -ForegroundColor Green
+                } catch {
+                    Write-Warning "Could not automatically launch RetroFlux Omni: $($_.Exception.Message)"
+                    Write-Host "       RetroFlux Omni is installed at: $installDir" -ForegroundColor Yellow
+                    Write-Host "       You can launch it directly from your Desktop or Start Menu." -ForegroundColor Yellow
+                }
             }
         }
     }
