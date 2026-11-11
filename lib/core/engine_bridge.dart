@@ -134,9 +134,8 @@ class EngineBridge {
       '-hide_banner',
     ];
 
-    // Hardware decoder acceleration before input
-    final hwAccelEnabled =
-        (task.options['hwAccel'] as bool? ?? true) && licenseService.isPro;
+    // Hardware decoder acceleration before input (Unlocked for all tiers)
+    final hwAccelEnabled = task.options['hwAccel'] as bool? ?? true;
     if (hwAccelEnabled && !isLosslessRemux && !isAudioTarget) {
       if (gpu.hasIntelQsv) {
         arguments.addAll(['-hwaccel', 'qsv']);
@@ -375,22 +374,34 @@ class EngineBridge {
       return _cachedFfmpegPath;
     }
 
-    // 1. Check WinGet Links
+    // 1. Check local application directory (companion portable FFmpeg)
+    final appDir = File(Platform.resolvedExecutable).parent.path;
+    final portablePath = Platform.isWindows
+        ? '$appDir\\ffmpeg.exe'
+        : '$appDir/ffmpeg';
+    if (File(portablePath).existsSync()) {
+      _cachedFfmpegPath = portablePath;
+      return portablePath;
+    }
+
+    // 2. Check dynamic WinGet Links on Windows
     if (Platform.isWindows) {
-      const winGetPath =
-          r'C:\Users\bonno\AppData\Local\Microsoft\WinGet\Links\ffmpeg.exe';
-      if (File(winGetPath).existsSync()) {
-        _cachedFfmpegPath = winGetPath;
-        return winGetPath;
+      final localAppData = Platform.environment['LOCALAPPDATA'];
+      if (localAppData != null && localAppData.isNotEmpty) {
+        final winGetPath = '$localAppData\\Microsoft\\WinGet\\Links\\ffmpeg.exe';
+        if (File(winGetPath).existsSync()) {
+          _cachedFfmpegPath = winGetPath;
+          return winGetPath;
+        }
       }
     }
 
-    // 2. Query system PATH
+    // 3. Query system PATH
     try {
       final cmd = Platform.isWindows ? 'where.exe' : 'which';
       final res = await Process.run(cmd, ['ffmpeg']);
       if (res.exitCode == 0) {
-        final path = res.stdout.toString().split('\n').first.trim();
+        final path = res.stdout.toString().split(RegExp(r'[\r\n]+')).first.trim();
         if (path.isNotEmpty && File(path).existsSync()) {
           _cachedFfmpegPath = path;
           return path;

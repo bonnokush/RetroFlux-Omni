@@ -508,46 +508,49 @@ class _MediaStudioState extends ConsumerState<MediaStudio> {
         borderRadius: BorderRadius.circular(28),
       ),
       child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: colorScheme.primaryContainer,
-                shape: BoxShape.circle,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: colorScheme.primaryContainer,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.movie_creation_outlined,
+                    color: colorScheme.primary, size: 36),
               ),
-              child: Icon(Icons.movie_creation_outlined,
-                  color: colorScheme.primary, size: 36),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Drag & Drop 4K Videos or Audio Files Here',
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: colorScheme.onSurface),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'MP4, MKV, MOV, WebM, AVI, TS, MP3, FLAC, WAV • Hardware GPU Accelerated',
-              style:
-                  TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
-            ),
-            const SizedBox(height: 20),
-            FilledButton.tonalIcon(
-              style: FilledButton.styleFrom(
-                shape: const StadiumBorder(),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              const SizedBox(height: 20),
+              Text(
+                'Drag & Drop 4K Videos or Audio Files Here',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: colorScheme.onSurface),
               ),
-              icon: const Icon(Icons.file_upload_outlined, size: 18),
-              label: const Text('Browse Files',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              onPressed: _pickMediaFiles,
-            ),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                'MP4, MKV, MOV, WebM, AVI, TS, MP3, FLAC, WAV • Hardware GPU Accelerated',
+                style:
+                    TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
+              ),
+              const SizedBox(height: 20),
+              FilledButton.tonalIcon(
+                style: FilledButton.styleFrom(
+                  shape: const StadiumBorder(),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                ),
+                icon: const Icon(Icons.file_upload_outlined, size: 18),
+                label: const Text('Browse Files',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                onPressed: _pickMediaFiles,
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -61,12 +61,13 @@ void main() {
       expect(find.text('Light'), findsOneWidget);
       expect(find.text('System'), findsOneWidget);
 
-      // Verify tooltips for all 5 Pixel Seeds
-      expect(find.byTooltip('Bay Blue'), findsOneWidget);
-      expect(find.byTooltip('Sage Green'), findsOneWidget);
-      expect(find.byTooltip('Lavender'), findsOneWidget);
-      expect(find.byTooltip('Terracotta'), findsOneWidget);
-      expect(find.byTooltip('Amber Gold'), findsOneWidget);
+      // Verify tooltips for all 6 Vibrant Pixel Seeds
+      expect(find.byTooltip('Cyber Blue'), findsOneWidget);
+      expect(find.byTooltip('Emerald Mint'), findsOneWidget);
+      expect(find.byTooltip('Electric Violet'), findsOneWidget);
+      expect(find.byTooltip('Sunburst Coral'), findsOneWidget);
+      expect(find.byTooltip('Solar Amber'), findsOneWidget);
+      expect(find.byTooltip('Neon Cyan'), findsOneWidget);
     });
   });
 }

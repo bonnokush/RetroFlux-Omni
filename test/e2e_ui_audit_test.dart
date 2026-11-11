@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:retroflux_omni/main.dart';
 import 'package:retroflux_omni/ui/dashboard_screen.dart';
+import 'package:retroflux_omni/core/license_service.dart';
 
 void main() {
   setUp(() {
@@ -13,7 +14,6 @@ void main() {
   group('RetroFlux-Omni End-to-End Automated UI & Behavior Audit', () {
     testWidgets('1. Launch & Render Tree Integrity Test',
         (WidgetTester tester) async {
-      // Set desktop-like constraints (1100x720)
       tester.view.physicalSize = const Size(1100, 720);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());
@@ -134,18 +134,20 @@ void main() {
 
       // Verify PRO modal opened cleanly
       expect(find.text('RETROFLUX PRO 4.0'), findsOneWidget);
-      expect(
-          find.text('Unlimited Batch Queue (vs. 3 on Free)'), findsOneWidget);
-      expect(find.text('4K Ultra HD Export (vs. 1080p Cap)'), findsOneWidget);
+      expect(find.text('Unlimited Batch Queue (vs. 3 items on Free)'),
+          findsOneWidget);
+      expect(find.text('4K Ultra HD Export (vs. 1080p Cap on Free)'),
+          findsOneWidget);
 
-      // Click "Fill Dev License"
-      final devFillBtn = find.text('Fill Dev License');
-      expect(devFillBtn, findsOneWidget);
-      await tester.tap(devFillBtn);
+      // Enter test license key into text field
+      final inputField = find.byType(TextField);
+      expect(inputField, findsOneWidget);
+      await tester.enterText(
+          inputField, LicenseService.generateValidDevKey());
       await tester.pumpAndSettle();
 
-      // Click "ACTIVATE"
-      final activateBtn = find.text('ACTIVATE');
+      // Click "ACTIVATE LICENSE"
+      final activateBtn = find.text('ACTIVATE LICENSE');
       expect(activateBtn, findsOneWidget);
       await tester.tap(activateBtn);
       await tester.pumpAndSettle();
@@ -187,9 +189,10 @@ void main() {
       // Verify desktop sidebar is hidden and mobile AppBar + BottomNavigationBar are rendered
       expect(find.byType(BottomNavigationBar), findsOneWidget);
       expect(find.text('RetroFlux Omni 4.0'), findsOneWidget);
-      expect(find.text('Dashboard'), findsOneWidget);
+      expect(find.text('Queue'), findsOneWidget);
+      expect(find.text('4K Media'), findsOneWidget);
+      expect(find.text('Images'), findsOneWidget);
       expect(find.text('History'), findsOneWidget);
-      expect(find.text('Settings'), findsOneWidget);
     });
   });
 }

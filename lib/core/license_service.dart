@@ -96,12 +96,12 @@ class LicenseService {
     }
   }
 
-  /// Opens the Lemon Squeezy checkout page in the system default browser
+  /// Opens the Lemon Squeezy checkout page safely in the system default browser
   static Future<void> openCheckoutPage() async {
     if (kIsWeb) return;
     try {
       if (Platform.isWindows) {
-        await Process.run('cmd', ['/c', 'start', '', checkoutUrl]);
+        await Process.run('explorer.exe', [checkoutUrl]);
       } else if (Platform.isMacOS) {
         await Process.run('open', [checkoutUrl]);
       } else if (Platform.isLinux) {
@@ -238,12 +238,21 @@ class LicenseService {
     _customerName = null;
   }
 
-  /// Generates a test PRO license key for offline evaluation
-  static String generateValidDevKey() {
-    return 'RFLX-PRO-7788-9900-OMNI';
-  }
+  /// Internal test key for test harness verification (Disabled in release mode)
+  static String generateValidDevKey() => 'RFLX-PRO-7788-9900-OMNI';
 
-  // --- Internals ---
+  // --- Cryptographic Security & Anti-Tampering ---
+
+  static String _getMachineFingerprint() {
+    if (kIsWeb) return 'web_client';
+    final name = Platform.isWindows
+        ? (Platform.environment['COMPUTERNAME'] ?? 'win_pc')
+        : Platform.localHostname;
+    final user = Platform.environment['USERNAME'] ??
+        Platform.environment['USER'] ??
+        'default_user';
+    return '$name:$user';
+  }
 
   Future<void> _saveActiveLicense(String key,
       {String? instanceId, String? customer}) async {
@@ -265,6 +274,7 @@ class LicenseService {
   }
 
   bool _validateDevKeyFormat(String key) {
+    if (!kDebugMode) return false;
     if (!key.startsWith('RFLX-PRO-')) return false;
     final parts = key.split('-');
     if (parts.length != 5) return false;
@@ -272,14 +282,16 @@ class LicenseService {
   }
 
   String _generateToken(String key) {
+    final payload = '$key:${_getMachineFingerprint()}';
     final hmac = Hmac(sha256, utf8.encode(_signingSalt));
-    final digest = hmac.convert(utf8.encode(key));
+    final digest = hmac.convert(utf8.encode(payload));
     return digest.toString();
   }
 
   bool _verifyToken(String key, String token) {
+    final payload = '$key:${_getMachineFingerprint()}';
     final hmac = Hmac(sha256, utf8.encode(_signingSalt));
-    final expected = hmac.convert(utf8.encode(key)).toString();
+    final expected = hmac.convert(utf8.encode(payload)).toString();
     return expected == token;
   }
 }

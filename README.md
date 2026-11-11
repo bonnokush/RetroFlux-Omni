@@ -31,11 +31,17 @@ irm https://raw.githubusercontent.com/bonnokush/RetroFlux-Omni/main/install.ps1 
 ## 📸 Screenshots & Interface
 
 <p align="center">
-  <img src="website/screenshots/01-retroflux-4k-media-studio.png" alt="RetroFlux Omni 4K Media Studio" width="100%" style="border-radius: 12px; margin-bottom: 12px;" />
+  <img src="https://raw.githubusercontent.com/bonnokush/RetroFlux-Omni/main/website/screenshots/01-retroflux-4k-media-studio.png" alt="RetroFlux Omni 4K Media Studio" width="100%" style="border-radius: 12px; margin-bottom: 8px;" />
+</p>
+<p align="center">
+  <em>⚡ RetroFlux Omni — Dedicated 4K Ultra HD Transcoding & Autodetected Silicon GPU Acceleration</em>
 </p>
 
 <p align="center">
-  <img src="website/screenshots/02-instant-lossless-remux.png" alt="Instant Lossless Remux Engine" width="100%" style="border-radius: 12px;" />
+  <img src="https://raw.githubusercontent.com/bonnokush/RetroFlux-Omni/main/website/screenshots/02-instant-lossless-remux.png" alt="Instant Lossless Remux Engine" width="100%" style="border-radius: 12px; margin-bottom: 8px;" />
+</p>
+<p align="center">
+  <em>⚡ Instant 1-Second Lossless Remuxing (-c copy) & Google Pixel Material You Interface</em>
 </p>
 
 ---
